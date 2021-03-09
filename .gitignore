@@ -1,0 +1,15 @@
+# Virtual environment files
+Lib
+Scripts
+pyvenv.cfg
+
+# Python compiled files
+*.pyc
+*.pyd
+
+# Pycharm files
+.idea
+
+# Vscode files
+.vscode
+
