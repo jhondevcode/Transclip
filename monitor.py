@@ -21,7 +21,7 @@ class ClipboardContentTranslator:
     """ Esta clase provee las funcionalidades para traducir texto """
 
     def set_source(self, source) -> None:
-        """ Este metodo cambia el source y crea un nuevo traductor con las configuraciones especificadas """
+        """ Este método cambia el source y crea un nuevo traductor con las configuraciones especificadas """
         if source != self.__source and source != self.__target:
             self.__source = source
             del self.__translator
@@ -30,7 +30,7 @@ class ClipboardContentTranslator:
             raise LangConfigurationsError()
 
     def set_target(self, target) -> None:
-        """ Este metodo cambia el target y crea un nuevo traductor con las configuraciones especificadas """
+        """ Este método cambia el target y crea un nuevo traductor con las configuraciones especificadas """
         if target != self.__target and target != self.__source:
             print("Creating translator")
             self.__target = target
@@ -40,15 +40,15 @@ class ClipboardContentTranslator:
             raise LangConfigurationsError()
 
     def __create_translator(self) -> None:
-        """ Este metodo crea un traductor con el source y target especificado """
+        """ Este método crea un traductor con el source y target especificado """
         self.__translator: GoogleTranslator = GoogleTranslator(self.__source, self.__target)
 
     def translate(self, text: str) -> str:
-        """ Este metodo se encarga de traducir el texto que se le pase por parametro """
+        """ Este método se encarga de traducir el texto que se le pase por parámetro """
         return self.__translator.translate(text)
 
     def __init__(self, source: str = 'en', target: str = 'es'):
-        """ Este constructor inicia los atributos basicos """
+        """ Este constructor inicia los atributos básicos """
         if target != source:
             self.__source = source
             self.__target = target
@@ -76,24 +76,24 @@ class ClipboardMonitor(QThread):
         self.translator = translator
 
     def start(self, priority=None) -> None:
-        """ Este metodo inicia el proceso de lectura del portapapeles """
+        """ Este método inicia el proceso de lectura del portapapeles """
         self.state = True
         super(ClipboardMonitor, self).start()
 
     def stop_action(self) -> None:
-        """ Este metodo detiene el proceso de lectura del portapapeles """
+        """ Este método detiene el proceso de lectura del portapapeles """
         if self.is_running():
             try:
                 self.state = False
             except Exception as ex:
-                QMessageBox.warning(None, 'Error', f"A problem as ocurred: {ex}")
+                QMessageBox.warning(None, 'Error', f"A problem as occurred: {ex}")
 
     def is_running(self) -> bool:
-        """ Este metodo sirve para verificar si el monitor se esta ejecutando """
+        """ Este método sirve para verificar si el monitor se esta ejecutando """
         return self.state
 
     def run(self) -> None:
-        """ Este metodo inicia el ciclo que constantemente lee el contenido del portapapeles """
+        """ Este método inicia el ciclo que constantemente lee el contenido del portapapeles """
         while self.is_running():
             clipboard_content: str = paste()
             if (clipboard_content is not None) and (clipboard_content.__len__() > 0):
@@ -108,5 +108,5 @@ class ClipboardMonitor(QThread):
                             self.text_edit_signal.emit(f"A error as occurred {ex}")
                     except TypeError as e:
                         print(e)
-                        QMessageBox.warning(None, "TypeError", f"A problem as ocurred: {e}")
+                        QMessageBox.warning(None, "TypeError", f"A problem as occurred: {e}")
             sleep(self.delay_time)

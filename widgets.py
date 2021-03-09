@@ -21,7 +21,7 @@ class ConfigurationDialog(QDialog):
         self.initialize_gui()
 
     def initialize_gui(self):
-        """ Llama a los metodos que inician los componentes """
+        """ Llama a los métodos que inician los componentes """
         self.setWindowTitle("Configurations")
         self.create_internal_box()
         self.create_editor_box()
