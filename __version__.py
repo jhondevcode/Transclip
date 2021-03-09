@@ -1,0 +1,8 @@
+__title__ = 'Transclip'
+__description__ = 'Translate clipboard content'
+__url__ = 'https://github.com/jhondev-code/Transclip'
+__version__ = '1.0.0'
+__author__ = 'Jhon fernandez'
+__author_email__ = 'jhondev.code@gmail.com'
+__license__ = 'Apache 2.0'
+__copyright__ = 'Copyright 2020 Jhon fernandez'
