@@ -2,6 +2,8 @@
 Lib
 Scripts
 pyvenv.cfg
+bin
+lib
 
 # Python compiled files
 *.pyc
@@ -12,4 +14,7 @@ pyvenv.cfg
 
 # Vscode files
 .vscode
+
+# Configuration file
+config.json
 
