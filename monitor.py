@@ -60,7 +60,8 @@ class ClipboardContentTranslator:
 class ClipboardMonitor(QThread):
     """ Class Description """
 
-    text_edit_signal = pyqtSignal(str)
+    source_signal = pyqtSignal(str)
+    target_signal = pyqtSignal(str)
 
     def __init__(self, delay: float, translator: ClipboardContentTranslator):
         """ Este constructor inicia con el tiempo de espera y el requeridor de contenido """
@@ -92,21 +93,34 @@ class ClipboardMonitor(QThread):
         """ Este método sirve para verificar si el monitor se esta ejecutando """
         return self.state
 
+    def retry(self) -> None:
+        for retry_seconds in range(5, 0):
+            self.target_signal.emit(f"Retrying in {retry_seconds}")
+            sleep(1)
+
+    def invoke_translate(self, content: str, old: str):
+        self.source_signal.emit(content)
+        self.target_signal.emit("Translating...")
+        try:
+            translated = self.translator.translate(content)
+            self.target_signal.emit(translated)
+            copy(content)
+            return content
+        except Exception:
+            self.retry()
+            return old
+
     def run(self) -> None:
         """ Este método inicia el ciclo que constantemente lee el contenido del portapapeles """
+        old_content = ""
         while self.is_running():
             clipboard_content: str = paste()
             if (clipboard_content is not None) and (clipboard_content.__len__() > 0):
                 if '\n' in clipboard_content:
-                    try:
-                        new_content = clipboard_content.replace('\r', "").replace('\n', ' ')
-                        copy(new_content)
-                        try:
-                            translated = self.translator.translate(new_content)
-                            self.text_edit_signal.emit(translated)
-                        except Exception as ex:
-                            self.text_edit_signal.emit(f"A error as occurred {ex}")
-                    except TypeError as e:
-                        print(e)
-                        QMessageBox.warning(None, "TypeError", f"A problem as occurred: {e}")
+                    clipboard_content = clipboard_content.replace('\r', "").replace('\n', ' ')
+                if clipboard_content != old_content:
+                    old_content = self.invoke_translate(clipboard_content, old_content)
+                else:
+                    if old_content == "":
+                        old_content = self.invoke_translate(clipboard_content, old_content)
             sleep(self.delay_time)
