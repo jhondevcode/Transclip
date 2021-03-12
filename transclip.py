@@ -1,10 +1,10 @@
 from PyQt5.QtGui import QPixmap, QIcon, QCloseEvent, QFont
 from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout
-from PyQt5.QtWidgets import QPushButton, QStatusBar, QTextEdit, QMessageBox, QProgressBar
+from PyQt5.QtWidgets import QPushButton, QStatusBar, QMessageBox
 from PyQt5.QtWidgets import QWidget, QLabel
 from monitor import ClipboardContentTranslator, ClipboardMonitor
 from moson import ConfigurationProcessor
-from widgets import ConfigurationDialog
+from widgets import ConfigurationDialog, EditText
 
 PLAY_BUTTON_ICON = "resources/img/play-button.png"
 STOP_BUTTON_ICON = "resources/img/stop-button.png"
@@ -29,15 +29,31 @@ class MainWindow(QWidget):
         self.resize(800, 400)
         self.__main_layout = QVBoxLayout()
         self.initialize_options_layout()
-
-        # Init the text pane
-        self.text_edit = QTextEdit()
-        font = self.__configuration_file.get('font')
-        self.set_editor_font(QFont(font['family'], font['size']))
-        self.text_edit.textChanged.connect(self.text_changed_event)
-        self.__main_layout.addWidget(self.text_edit)
+        self.initialize_text_containers()
         # Init the status bar
         self.initialize_status_bar()
+
+    def initialize_text_containers(self):
+        # loading edit text configurations
+        font = self.__configuration_file.get('font')
+        style_sheet = self.__configuration_file.get("edit-text")
+        # Init the original text panel
+        original_edit_text = EditText(self, title="Original text")
+        self.original_edit = original_edit_text.get_edit_text()
+        self.set_original_edit_font(QFont(font['family'], font['size']))
+        style = "QTextEdit {color: " + style_sheet["source"]["foreground"] +\
+                "; background-color: " + style_sheet["source"]["background"] + ";}"
+        original_edit_text.get_edit_text().setStyleSheet(style)
+        self.__main_layout.addWidget(original_edit_text.get_widget())
+
+        # Init the translated text panel
+        translated_edit_text = EditText(self, title="Translated text")
+        self.translated_edit = translated_edit_text.get_edit_text()
+        self.set_editor_font(QFont(font['family'], font['size']))
+        style = "QTextEdit {color: " + style_sheet["target"]["foreground"] + \
+                "; background-color: " + style_sheet["target"]["background"] + ";}"
+        translated_edit_text.get_edit_text().setStyleSheet(style)
+        self.__main_layout.addWidget(translated_edit_text.get_widget())
 
     def initialize_options_layout(self):
         buttons_layout = QHBoxLayout()
@@ -54,12 +70,6 @@ class MainWindow(QWidget):
         self.stop_button.clicked.connect(self.stop_button_action)
         buttons_layout.addWidget(self.stop_button)
 
-        self.clear_button = QPushButton(QIcon(QPixmap(CLEAN_BUTTON_ICON)), "Clear")
-        self.clear_button.setEnabled(False)
-        self.clear_button.setToolTip("Clean the text pane")
-        self.clear_button.clicked.connect(self.clear_edit_text)
-        buttons_layout.addWidget(self.clear_button)
-
         self.config_button = QPushButton(QIcon(QPixmap(SETTINGS_BUTTON_ICON)), "Configure")
         self.config_button.setToolTip("Configure transclip")
         self.config_button.clicked.connect(self.config_button_action)
@@ -72,9 +82,6 @@ class MainWindow(QWidget):
 
         self.__main_layout.addLayout(buttons_layout)
 
-    def text_changed_event(self):
-        self.clear_button.setEnabled(len(self.text_edit.toPlainText()) > 0)
-
     def initialize_status_bar(self):
         self.status_bar = QStatusBar()
         self.__main_layout.addWidget(self.status_bar)
@@ -85,9 +92,13 @@ class MainWindow(QWidget):
     def close(self) -> None:
         super(MainWindow, self).close()
 
-    def paste_text(self, string: str) -> None:
+    def set_target_text(self, string: str) -> None:
         if string != "":
-            self.text_edit.setPlainText(string)
+            self.translated_edit.setPlainText(string)
+
+    def set_source_text(self, original: str) -> None:
+        if original != "":
+            self.original_edit.setPlainText(original)
 
     def set_connection_status(self, state: bool = False, other: str = "") -> None:
         if other != "":
@@ -110,11 +121,12 @@ class MainWindow(QWidget):
             self.clip_thread = ClipboardMonitor(delay_time, self.translator)
             self.stop_button.setEnabled(True)
             self.start_button.setEnabled(False)
-            self.clip_thread.text_edit_signal.connect(self.paste_text)
+            self.clip_thread.source_signal.connect(self.set_source_text)
+            self.clip_thread.target_signal.connect(self.set_target_text)
             self.clip_thread.start()
             self.set_connection_status(True)
         except Exception as ex:
-            print(f"Error: {ex}")
+            print(f"Error: {ex} jajaja")
 
     def stop_button_action(self) -> None:
         try:
@@ -125,9 +137,6 @@ class MainWindow(QWidget):
         except Exception as ex:
             print(f"Error: {ex}")
 
-    def clear_edit_text(self) -> None:
-        self.text_edit.clear()
-
     def config_button_action(self) -> None:
         try:
             win = ConfigurationDialog(self)
@@ -137,7 +146,11 @@ class MainWindow(QWidget):
 
     def set_editor_font(self, font) -> None:
         if font is not None:
-            self.text_edit.setFont(font)
+            self.translated_edit.setFont(font)
+
+    def set_original_edit_font(self, font) -> None:
+        if font is not None:
+            self.original_edit.setFont(font)
 
     # noinspection PyMethodMayBeStatic
     def set_sleep_time(self, interval) -> None:
