@@ -7,7 +7,6 @@ from moson import ConfigurationProcessor
 
 COLOR_BUTTON_ICON = "resources/img/config/color-button.png"
 FONT_BUTTON_ICON = "resources/img/config/font-button.png"
-FONT_STYLES = ['Normal', 'Italic', 'Oblique']
 
 
 # noinspection PyAttributeOutsideInit
@@ -50,6 +49,7 @@ class ConfigurationDialog(QDialog):
         components_layout = QHBoxLayout()
         self.font_input: QLineEdit = QLineEdit(str(font_configuration['family']))
         components_layout.addWidget(self.font_input)
+
         option_button = QPushButton(QIcon(QPixmap(FONT_BUTTON_ICON)), "")
         option_button.clicked.connect(self.font_selection)
         components_layout.addWidget(option_button)
@@ -58,22 +58,6 @@ class ConfigurationDialog(QDialog):
         self.font_size: QSpinBox = QSpinBox()
         self.font_size.setValue(int(font_configuration['size']))
         layout.addRow(QLabel("Font size:"), self.font_size)
-
-        self.font_style: QComboBox = QComboBox()
-        saved_style = str(font_configuration['style'])
-        self.font_style.addItem(saved_style)
-        for style in FONT_STYLES:
-            if style != saved_style:
-                self.font_style.addItem(style)
-        layout.addRow(QLabel("Font style:"), self.font_style)
-
-        components_layout = QHBoxLayout()
-        self.font_color: QLineEdit = QLineEdit(str(font_configuration['color']))
-        components_layout.addWidget(self.font_color)
-        option_button: QPushButton = QPushButton(QIcon(QPixmap(COLOR_BUTTON_ICON)), "")
-        option_button.clicked.connect(self.color_selection)
-        components_layout.addWidget(option_button)
-        layout.addRow(QLabel("Font Color:"), components_layout)
 
         editor_box.setLayout(layout)
         self.main_layout.addWidget(editor_box)
@@ -117,11 +101,79 @@ class ConfigurationDialog(QDialog):
             QMessageBox.warning(self, "Error", "Unexpected char in delay input", QMessageBox.Ok)
         self.configuration.set("font", {
             "family": self.font_input.text(),
-            "style": "Normal",
-            "size": self.font_size.value(),
-            "color": self.font_color.text()})
+            "size": self.font_size.value()})
         self.configuration.set("language", {"source": self.source_input.text(), "target": self.target_input.text()})
         super().accept()
 
     def reject(self) -> None:
         super().reject()
+
+
+from PyQt5.QtWidgets import QTextEdit
+
+CLEAN_BUTTON_ICON = "resources/img/clean-button.png"
+
+
+class EditText:
+
+    BACKGROUND_COLOR = "#ffffff"
+    FOREGROUND_COLOR = "#000000"
+
+    def __init__(self, parent, title="None"):
+        super(EditText, self).__init__()
+        self.__parent = parent
+        self.__title = title
+        self.__edit_text = QTextEdit()
+        self.__main_layout = QVBoxLayout()
+        self.__buttons_layout = QHBoxLayout()
+        self.initialize_ui()
+
+    def initialize_buttons(self):
+        self.__widget = QGroupBox(self.__title)
+        self.clear_button = QPushButton(QIcon(QPixmap(CLEAN_BUTTON_ICON)), "Clear")
+        self.clear_button.setEnabled(False)
+        self.clear_button.setToolTip("Clean the text pane")
+        self.clear_button.clicked.connect(lambda: self.__edit_text.clear())
+        self.__buttons_layout.addWidget(self.clear_button)
+
+        self.foreground_color_button = QPushButton(QIcon(QPixmap(COLOR_BUTTON_ICON)), "Foreground")
+        self.foreground_color_button.setToolTip("Change background color")
+        self.foreground_color_button.clicked.connect(self.__change_foreground)
+        self.__buttons_layout.addWidget(self.foreground_color_button)
+
+        self.background_color_button = QPushButton(QIcon(QPixmap(COLOR_BUTTON_ICON)), "Background")
+        self.background_color_button.setToolTip("Change foreground color")
+        self.background_color_button.clicked.connect(self.__change_background)
+        self.__buttons_layout.addWidget(self.background_color_button)
+
+        self.__widget.setLayout(self.__main_layout)
+
+    def initialize_ui(self) -> None:
+        # Initialize the event for the edit text
+        self.__edit_text.textChanged.connect(
+            lambda: self.clear_button.setEnabled(len(self.__edit_text.toPlainText()) > 0))
+        # initializing the buttons
+        self.initialize_buttons()
+        # Adding components to main layout
+        self.__main_layout.addLayout(self.__buttons_layout)
+        self.__main_layout.addWidget(self.__edit_text)
+
+    def __change_foreground(self):
+        foreground_color = QColorDialog().getColor(QColor(str("#000000")), self.__parent)
+        if foreground_color.isValid():
+            self.FOREGROUND_COLOR = foreground_color.name()
+            style = "QTextEdit {color: " + foreground_color.name() + "; background-color: " + self.BACKGROUND_COLOR + ";}"
+            self.__edit_text.setStyleSheet(style)
+
+    def __change_background(self):
+        background_color = QColorDialog().getColor(QColor(str("#000000")), self.__parent)
+        if background_color.isValid():
+            self.BACKGROUND_COLOR = background_color.name()
+            style = "QTextEdit {color: " + self.FOREGROUND_COLOR + "; background-color: " + background_color.name() + ";}"
+            self.__edit_text.setStyleSheet(style)
+
+    def get_widget(self) -> QGroupBox:
+        return self.__widget
+
+    def get_edit_text(self) -> QTextEdit:
+        return self.__edit_text
