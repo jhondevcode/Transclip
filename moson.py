@@ -9,15 +9,12 @@ class ConfigurationProcessor:
     def __load_configuration_file(self) -> None:
         """ Este método es el encargado de cargar el archivo de configuraciones """
         try:
-            self.__json_file = open(self.__file_name)
+            with open(self.__file_name) as file:
+                self.__data_file = json.load(file)
         except FileNotFoundError:
             self.__load_default_config()
-            self.__json_file = open(self.__file_name)
-
-    def __read_configuration_file(self) -> None:
-        """ Este método lee el archivo de configuración """
-        self.__data_file = json.load(self.__json_file)
-        self.__json_file.close()
+            with open(self.__file_name) as file:
+                self.__data_file = json.load(file)
 
     def get(self, key):
         """ Este método es usado para devolver una key del archivo de configuración """
@@ -40,16 +37,25 @@ class ConfigurationProcessor:
         else:
             font_name = "Arial"
         config = {
-            "delay": 0.5,
+            "delay": 0.2,
             "font": {
                 "family": font_name,
-                "style": "Bold",
-                "size": 12,
-                "color": "#000000"
+                "style": "Normal",
+                "size": 15
             },
             "language": {
                 "source": "en",
                 "target": "es"
+            },
+            "edit-text": {
+                "source": {
+                    "background": "#ffffff",
+                    "foreground": "#000000"
+                },
+                "target": {
+                    "background": "#ffffff",
+                    "foreground": "#000000"
+                }
             }
         }
         self.write(config, "config.json")
@@ -58,4 +64,3 @@ class ConfigurationProcessor:
         """ Constructor el cual carga y lee el archivo de configuraciones """
         self.__file_name = file_name
         self.__load_configuration_file()
-        self.__read_configuration_file()
