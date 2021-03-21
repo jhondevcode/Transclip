@@ -1,23 +1,39 @@
-import platform
-from PyQt5.QtWidgets import QApplication
-import sys
+import wx
 
-from transclip import MainWindow
+import logger
+from transclip import AppWindow
 
-OS_NAME = platform.system()
-OS_VERSION = platform.version()
-OS_RELEASE = platform.release()
-OS_MACHINE = platform.machine()
+
+# noinspection PyAttributeOutsideInit
+class App(wx.App):
+    """This class starts the application"""
+
+    def __init__(self):
+        """Call the constructor of Object"""
+        super(App, self).__init__()
+
+    def OnInit(self) -> bool:
+        """This method is used to start the application"""
+        try:
+            logger.info("Initializing application")
+            self.frame = AppWindow()
+            self.frame.Show()
+            self.SetTopWindow(self.frame)
+            return True
+        except Exception as ex:
+            logger.log(ex)
+            return False
 
 
 def main():
-    app = QApplication(sys.argv)
-    window = MainWindow()
-    window.show()
-    sys.exit(app.exec())
+    """Run the app"""
+    try:
+        logger.info("Running the application")
+        app = App()
+        app.MainLoop()
+    except Exception as ex:
+        logger.log(ex)
 
 
 if __name__ == '__main__':
-    print("Welcome to transclip")
-    print(f"Running on: {OS_NAME} {OS_RELEASE} {OS_MACHINE}")
     main()

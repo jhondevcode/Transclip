@@ -1,169 +1,170 @@
-from PyQt5.QtGui import QPixmap, QIcon, QCloseEvent, QFont
-from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout
-from PyQt5.QtWidgets import QPushButton, QStatusBar, QMessageBox
-from PyQt5.QtWidgets import QWidget, QLabel
-from monitor import ClipboardContentTranslator, ClipboardMonitor
-from moson import ConfigurationProcessor
-from widgets import ConfigurationDialog, EditText
-
-PLAY_BUTTON_ICON = "resources/img/play-button.png"
-STOP_BUTTON_ICON = "resources/img/stop-button.png"
-CLEAN_BUTTON_ICON = "resources/img/clean-button.png"
-SETTINGS_BUTTON_ICON = "resources/img/settings-button.png"
-SHUTDOWN_BUTTON_ICON = "resources/img/shutdown-button.png"
+import wx
+import logger
+from monitoring import Requester, ClipboardMonitor
+from loaders import IconLoader, ConfigurationLoader
+from widgets import TextContainer, InformationBar, AboutDialog
+from util import img_load_scaled_bitmap, check_button_bitmap
 
 
-# noinspection PyAttributeOutsideInit
-class MainWindow(QWidget):
+# noinspection PyMethodMayBeStatic,PyUnusedLocal
+class AppWindow(wx.Frame, Requester):
+    """This class creates the main program window as well as start the widgets"""
 
     def __init__(self):
-        super(MainWindow, self).__init__()
-        self.__configuration_file = ConfigurationProcessor()
-        self.__main_layout: QVBoxLayout
+        """Launch settings and widgets"""
+        super(AppWindow, self).__init__(None, title="Transclip 1.0.0 wx version")
+        width, height = wx.GetDisplaySize()
+        # self.SetSize(width=width/2, height=height/2)
+        self.SetMinSize(size=(width / 2.5, height / 2.5))
+        self.__panel = wx.Panel(self)
+        self.__widget_layout = wx.BoxSizer(wx.VERTICAL)
+        self.setup_events()
+        self.initialize_window_features()
         self.initialize_ui()
-        self.setLayout(self.__main_layout)
+        self.__panel.SetSizer(self.__widget_layout)
+
+    def setup_events(self):
+        """Records window events"""
+        logger.info("Logging window events")
+        self.Bind(wx.EVT_CLOSE, self.on_destroy)
+
+    def initialize_window_features(self) -> None:
+        """Configure the window characteristics"""
+        logger.info("Initializing window features")
+        icon = IconLoader("favicon.png").get()
+        if icon is not None:
+            self.SetIcon(icon)
 
     def initialize_ui(self):
-        self.setWindowIcon(QIcon("resources/img/favicon.png"))
-        self.setWindowTitle("Transclip")
-        self.resize(800, 400)
-        self.__main_layout = QVBoxLayout()
-        self.initialize_options_layout()
-        self.initialize_text_containers()
-        # Init the status bar
-        self.initialize_status_bar()
+        """comment"""
+        logger.info("Initializing ui widgets")
+        self._init_options_panel()
+        self._init_text_containers()
+        self._init_notification_bar()
 
-    def initialize_text_containers(self):
-        # loading edit text configurations
-        font = self.__configuration_file.get('font')
-        style_sheet = self.__configuration_file.get("edit-text")
-        # Init the original text panel
-        original_edit_text = EditText(self, title="Original text")
-        self.original_edit = original_edit_text.get_edit_text()
-        self.set_original_edit_font(QFont(font['family'], font['size']))
-        style = "QTextEdit {color: " + style_sheet["source"]["foreground"] +\
-                "; background-color: " + style_sheet["source"]["background"] + ";}"
-        original_edit_text.get_edit_text().setStyleSheet(style)
-        self.__main_layout.addWidget(original_edit_text.get_widget())
+    def _init_options_panel(self):
+        """comment"""
+        logger.info("Initializing option container")
+        # initialize options container
+        option_layout = wx.BoxSizer(wx.HORIZONTAL)
+        # initialize option buttons
+        self.start_button: wx.Button = wx.Button(self.__panel, label="Start")
+        check_button_bitmap(self.start_button, img_load_scaled_bitmap("play-button.png", 16, 16))
+        self.start_button.Bind(wx.EVT_BUTTON, self.__start_button_action)
+        option_layout.Add(self.start_button, 0, wx.ALL, 5)
 
-        # Init the translated text panel
-        translated_edit_text = EditText(self, title="Translated text")
-        self.translated_edit = translated_edit_text.get_edit_text()
-        self.set_editor_font(QFont(font['family'], font['size']))
-        style = "QTextEdit {color: " + style_sheet["target"]["foreground"] + \
-                "; background-color: " + style_sheet["target"]["background"] + ";}"
-        translated_edit_text.get_edit_text().setStyleSheet(style)
-        self.__main_layout.addWidget(translated_edit_text.get_widget())
+        self.stop_button: wx.Button = wx.Button(self.__panel, label="Stop")
+        check_button_bitmap(self.stop_button, img_load_scaled_bitmap("stop-button.png", 16, 16))
+        self.stop_button.Bind(wx.EVT_BUTTON, self.__stop_button_action)
+        self.stop_button.Enable(enable=False)
+        option_layout.Add(self.stop_button, 0, wx.ALL, 5)
 
-    def initialize_options_layout(self):
-        buttons_layout = QHBoxLayout()
+        self.conf_button: wx.Button = wx.Button(self.__panel, label="Configure")
+        check_button_bitmap(self.conf_button, img_load_scaled_bitmap("settings-button.png", 16, 16))
+        self.conf_button.Bind(wx.EVT_BUTTON, self.__conf_button_action)
+        option_layout.Add(self.conf_button, 0, wx.ALL, 5)
 
-        self.start_button = QPushButton(QIcon(QPixmap(PLAY_BUTTON_ICON)), "Start")
-        self.start_button.setDefault(True)
-        self.start_button.setToolTip("Start clipboard monitoring")
-        self.start_button.clicked.connect(self.star_button_action)
-        buttons_layout.addWidget(self.start_button)
+        self.about_button: wx.Button = wx.Button(self.__panel, label="About")
+        check_button_bitmap(self.about_button, img_load_scaled_bitmap("about-button.png", 16, 16))
+        self.about_button.Bind(wx.EVT_BUTTON, self.__about_button_action)
+        option_layout.Add(self.about_button, 0, wx.ALL, 5)
 
-        self.stop_button = QPushButton(QIcon(QPixmap(STOP_BUTTON_ICON)), "Stop")
-        self.stop_button.setEnabled(False)
-        self.stop_button.setToolTip("Stop clipboard monitoring")
-        self.stop_button.clicked.connect(self.stop_button_action)
-        buttons_layout.addWidget(self.stop_button)
+        self.exit_button: wx.Button = wx.Button(self.__panel, label="Exit")
+        check_button_bitmap(self.exit_button, img_load_scaled_bitmap("shutdown-button.png", 16, 16))
+        self.exit_button.Bind(wx.EVT_BUTTON, self.__exit_button_action)
+        option_layout.Add(self.exit_button, 0, wx.ALL, 5)
+        self.__widget_layout.Add(option_layout, 0, wx.CENTER)
 
-        self.config_button = QPushButton(QIcon(QPixmap(SETTINGS_BUTTON_ICON)), "Configure")
-        self.config_button.setToolTip("Configure transclip")
-        self.config_button.clicked.connect(self.config_button_action)
-        buttons_layout.addWidget(self.config_button)
+    def _init_text_containers(self):
+        """Start the text containers"""
+        logger.info("Initializing text containers")
+        self.source_container = TextContainer(self.__panel)
+        self.__widget_layout.Add(self.source_container, 1, wx.CENTER | wx.EXPAND)
+        self.source_container.get_text_container().SetFont(wx.Font(15, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
 
-        self.exit_button = QPushButton(QIcon(QPixmap(SHUTDOWN_BUTTON_ICON)), "Exit")
-        self.exit_button.setToolTip("Turn off the program and exit")
-        self.exit_button.clicked.connect(self.close)
-        buttons_layout.addWidget(self.exit_button)
+        self.target_container = TextContainer(self.__panel)
+        self.target_container.get_text_container().SetFont(wx.Font(15, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
+        self.__widget_layout.Add(self.target_container, 1, wx.CENTER | wx.EXPAND)
 
-        self.__main_layout.addLayout(buttons_layout)
+    def _init_notification_bar(self):
+        """Start the information bar"""
+        logger.info("Initializing notification bar")
+        self.notification_bar = InformationBar(self.__panel)
+        self.__widget_layout.Add(self.notification_bar, 0, wx.CENTER)
 
-    def initialize_status_bar(self):
-        self.status_bar = QStatusBar()
-        self.__main_layout.addWidget(self.status_bar)
-        self.state_label = QLabel()
-        self.set_connection_status()
-        self.status_bar.addWidget(self.state_label)
+    def set_content(self, target: str, content: str):
+        """Modify the text of the textual containers"""
+        if target == "source":
+            self.source_container.get_text_container().SetValue(content)
+        elif target == "target":
+            self.target_container.get_text_container().SetValue(content)
 
-    def close(self) -> None:
-        super(MainWindow, self).close()
-
-    def set_target_text(self, string: str) -> None:
-        if string != "":
-            self.translated_edit.setPlainText(string)
-
-    def set_source_text(self, original: str) -> None:
-        if original != "":
-            self.original_edit.setPlainText(original)
-
-    def set_connection_status(self, state: bool = False, other: str = "") -> None:
-        if other != "":
-            self.state_label.setText(f"State: {other}")
-        else:
-            if state:
-                self.state_label.setText("State: Connected")
-            else:
-                self.state_label.setText("State: Disconnected")
-
-    def star_button_action(self) -> None:
+    def __start_button_action(self, event: wx.CommandEvent):
         try:
+            self.start_button.Enable(enable=False)
+            self.stop_button.Enable(enable=True)
+            self.notification_bar.set_state("Connecting...")
+            config = ConfigurationLoader()
+            from translation import PlainTextTranslator
             try:
-                delay_time = float(self.__configuration_file.get('delay'))
-            except ValueError:
-                delay_time = 0.5
-            source = self.__configuration_file.get('language')['source']
-            target = self.__configuration_file.get('language')['target']
-            self.translator = ClipboardContentTranslator(source, target)
-            self.clip_thread = ClipboardMonitor(delay_time, self.translator)
-            self.stop_button.setEnabled(True)
-            self.start_button.setEnabled(False)
-            self.clip_thread.source_signal.connect(self.set_source_text)
-            self.clip_thread.target_signal.connect(self.set_target_text)
-            self.clip_thread.start()
-            self.set_connection_status(True)
+                source: str = config.get("language")["source"]
+                target: str = config.get("language")["target"]
+            except Exception as ex:
+                source: str = "en"
+                target: str = "es"
+                logger.log(ex)
+            try:
+                delay_time: float = float(config.get("core")["delay"])
+                logger.info(f"Delay time established in {delay_time} seconds")
+            except Exception as ex:
+                logger.log(ex)
+                delay_time: float = 0.5
+            self.__clipboard_monitor = ClipboardMonitor(self, PlainTextTranslator(source, target), delay_time)
+            self.notification_bar.set_source(source)
+            self.notification_bar.set_target(target)
+            self.__clipboard_monitor.start_monitoring()
+            self.notification_bar.set_state("Connected")
         except Exception as ex:
-            print(f"Error: {ex} jajaja")
+            self.notification_bar.set_state("Bad network")
+            wx.MessageDialog(self, message="Can't connect to the network",
+                             caption="Error", style=wx.OK | wx.ICON_ERROR,
+                             pos=wx.DefaultPosition).ShowModal()
+            self.start_button.Enable(enable=True)
+            self.stop_button.Enable(enable=False)
+            logger.log(ex)
 
-    def stop_button_action(self) -> None:
+    def __stop_button_action(self, event: wx.CommandEvent = None):
         try:
-            self.start_button.setEnabled(True)
-            self.stop_button.setEnabled(False)
-            self.clip_thread.stop_action()
-            self.set_connection_status(False)
+            if self.__clipboard_monitor is not None:
+                self.notification_bar.set_state("Disconnecting...")
+                self.__clipboard_monitor.stop_monitoring()
+                self.notification_bar.set_state("Disconnected")
+            self.start_button.Enable(enable=True)
+            self.stop_button.Enable(enable=False)
         except Exception as ex:
-            print(f"Error: {ex}")
+            self.start_button.Enable(enable=False)
+            self.stop_button.Enable(enable=True)
+            self.notification_bar.set_state("Thread error")
+            logger.log(ex)
 
-    def config_button_action(self) -> None:
-        try:
-            win = ConfigurationDialog(self)
-            win.show()
-        except Exception as ex:
-            print(ex)
-
-    def set_editor_font(self, font) -> None:
-        if font is not None:
-            self.translated_edit.setFont(font)
-
-    def set_original_edit_font(self, font) -> None:
-        if font is not None:
-            self.original_edit.setFont(font)
-
-    # noinspection PyMethodMayBeStatic
-    def set_sleep_time(self, interval) -> None:
-        if interval > 0:
-            pass
-
-    def set_lang(self, source, target) -> None:
+    def __conf_button_action(self, event: wx.CommandEvent):
         pass
 
-    def closeEvent(self, event: QCloseEvent) -> None:
-        quit_message = QMessageBox.question(self, "Confirm exit", "Are you sure you want to exit?",
-                                            QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
-        if quit_message == QMessageBox.Yes:
-            event.accept()
+    def __about_button_action(self, event: wx.CommandEvent):
+        AboutDialog(self).show()
+
+    def __exit_button_action(self, event: wx.CommandEvent):
+        self.Close()
+
+    def on_destroy(self, event):
+        """This event is called when you want to close the program"""
+        logger.info("Exit event called")
+        dialog = wx.MessageDialog(self, message="Are you sure you want to quit?",
+                                  caption="Confirm exit", style=wx.YES_NO | wx.ICON_QUESTION,
+                                  pos=wx.DefaultPosition)
+        response = dialog.ShowModal()
+        if response == wx.ID_YES:
+            self.__stop_button_action()
+            self.Destroy()
         else:
-            event.ignore()
+            event.StopPropagation()
