@@ -18,3 +18,5 @@ lib
 # Configuration file
 config.json
 
+# Testing files
+test
