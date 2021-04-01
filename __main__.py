@@ -2,6 +2,7 @@ import wx
 
 import logger
 from transclip import AppWindow
+from pyperclip import copy
 
 
 # noinspection PyAttributeOutsideInit
@@ -27,6 +28,12 @@ class App(wx.App):
 
 def main():
     """Run the app"""
+    try:
+        logger.info("Cleanning the clipboard...")
+        copy("")
+    except Exception as ex:
+        logger.error("A error has ocurred while cleanning the clipboard")
+        logger.log(ex)
     try:
         logger.info("Running the application")
         app = App()

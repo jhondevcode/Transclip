@@ -6,15 +6,14 @@ import logger
 from pyperclip import copy, paste
 from time import sleep
 from threading import Thread
-from impl import Requester, AbstractMonitor
-from translation import PlainTextTranslator
+from impl import AbstractMonitor
 from formatters import PlainTextFormatter
 
 
 class ClipboardMonitor(Thread, AbstractMonitor):
     """This class is in charge of processing the clipboard content to later be translated into another language."""
 
-    def __init__(self, requester: Requester, translator: PlainTextTranslator, delay_time: float):
+    def __init__(self, requester, translator, delay_time: float):
         """This builder starts by requesting a content requester to submit the original and translated content"""
         super(ClipboardMonitor, self).__init__()
         self.__requester = requester
@@ -39,11 +38,6 @@ class ClipboardMonitor(Thread, AbstractMonitor):
         else:
             logger.error("The thread had already finished previously")
 
-    def retry(self) -> None:
-        for retry_seconds in range(5, 0):
-            wx.CallAfter(self.__requester.set_content, "target", f"Retrying in {retry_seconds}")
-            sleep(1)
-
     def invoke_translate(self, content: str, old: str):
         wx.CallAfter(self.__requester.set_content, "source", content)
         wx.CallAfter(self.__requester.set_content, "target", "Translating...")
@@ -54,7 +48,6 @@ class ClipboardMonitor(Thread, AbstractMonitor):
             return content
         except Exception as ex:
             logger.log(ex)
-            self.retry()
             return old
 
     def run(self):

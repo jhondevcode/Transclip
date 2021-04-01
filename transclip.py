@@ -1,9 +1,12 @@
 import wx
 import logger
-from monitoring import Requester, ClipboardMonitor
+from threading import Thread
+from monitoring import ClipboardMonitor
+from impl import Requester
 from loaders import IconLoader, ConfigurationLoader
 from widgets import TextContainer, InformationBar, AboutDialog
 from util import img_load_scaled_bitmap, check_button_bitmap
+from pyperclip import paste
 
 
 # noinspection PyMethodMayBeStatic,PyUnusedLocal
@@ -18,6 +21,7 @@ class AppWindow(wx.Frame, Requester):
         self.SetMinSize(size=(width / 2.5, height / 2.5))
         self.__panel = wx.Panel(self)
         self.__widget_layout = wx.BoxSizer(wx.VERTICAL)
+        self.__clipboard_monitor = None
         self.setup_events()
         self.initialize_window_features()
         self.initialize_ui()
@@ -99,11 +103,9 @@ class AppWindow(wx.Frame, Requester):
         elif target == "target":
             self.target_container.get_text_container().SetValue(content)
 
-    def __start_button_action(self, event: wx.CommandEvent):
+    def connect_to_server(self):
         try:
-            self.start_button.Enable(enable=False)
-            self.stop_button.Enable(enable=True)
-            self.notification_bar.set_state("Connecting...")
+            wx.CallAfter(self.start_button.Enable, False)
             config = ConfigurationLoader()
             from translation import PlainTextTranslator
             try:
@@ -120,32 +122,52 @@ class AppWindow(wx.Frame, Requester):
                 logger.log(ex)
                 delay_time: float = 0.5
             self.__clipboard_monitor = ClipboardMonitor(self, PlainTextTranslator(source, target), delay_time)
-            self.notification_bar.set_source(source)
-            self.notification_bar.set_target(target)
+            wx.CallAfter(self.notification_bar.set_source, source)
+            wx.CallAfter(self.notification_bar.set_target, target)
             self.__clipboard_monitor.start_monitoring()
-            self.notification_bar.set_state("Connected")
+            wx.CallAfter(self.notification_bar.set_state, "Connected")
+            wx.CallAfter(self.stop_button.Enable, True)
         except Exception as ex:
-            self.notification_bar.set_state("Bad network")
+            wx.CallAfter(self.notification_bar.set_state, "Bad network")
             wx.MessageDialog(self, message="Can't connect to the network",
                              caption="Error", style=wx.OK | wx.ICON_ERROR,
                              pos=wx.DefaultPosition).ShowModal()
-            self.start_button.Enable(enable=True)
-            self.stop_button.Enable(enable=False)
+            wx.CallAfter(self.start_button.Enable, True)
+            wx.CallAfter(self.stop_button.Enable, False)
             logger.log(ex)
 
-    def __stop_button_action(self, event: wx.CommandEvent = None):
+    def __start_button_action(self, event: wx.CommandEvent):
+        self.notification_bar.set_state("Connecting...")
+        connection = Thread(target=self.connect_to_server)
+        connection.start()
+
+    def disconnect_from_server(self):
+        logger.info("Desconnecting...")
         try:
+            logger.info("Checking the monitor")
             if self.__clipboard_monitor is not None:
-                self.notification_bar.set_state("Disconnecting...")
+                logger.info("Notifying the disconnection")
+                wx.CallAfter(self.notification_bar.set_state, "Disconnecting...")
+                logger.info("Stopping the monitor")
                 self.__clipboard_monitor.stop_monitoring()
-                self.notification_bar.set_state("Disconnected")
-            self.start_button.Enable(enable=True)
-            self.stop_button.Enable(enable=False)
+                logger.info("Notifying the stop of the monitor")
+                wx.CallAfter(self.notification_bar.set_state, "Disconnected")
+                logger.info("Disconnection completed")
+            wx.CallAfter(self.start_button.Enable, True)
+            wx.CallAfter(self.stop_button.Enable, False)
+            logger.info("Resetting the buttons")
+        except AttributeError as ae:
+            logger.warn("The monitor has not started")
+            logger.log(ae)
         except Exception as ex:
-            self.start_button.Enable(enable=False)
-            self.stop_button.Enable(enable=True)
-            self.notification_bar.set_state("Thread error")
+            logger.error("An exception was reported when stopping the monitor")
             logger.log(ex)
+            wx.CallAfter(self.notification_bar.set_state, "Thread error")
+
+    def __stop_button_action(self, event: wx.CommandEvent = None):
+        # disconnect = Thread(target=self.disconnect_from_server)
+        # disconnect.start()
+        self.disconnect_from_server()
 
     def __conf_button_action(self, event: wx.CommandEvent):
         pass
@@ -164,7 +186,16 @@ class AppWindow(wx.Frame, Requester):
                                   pos=wx.DefaultPosition)
         response = dialog.ShowModal()
         if response == wx.ID_YES:
-            self.__stop_button_action()
+            try:
+                if self.__clipboard_monitor is not None:
+                    if self.__clipboard_monitor.is_running():
+                        self.__clipboard_monitor.stop_monitoring()
+                    else:
+                        logger.info("The monitor had already been stopped before")
+                else:
+                    logger.info("Monitor has never been started")
+            except Exception as ex:
+                logger.log(ex)
             self.Destroy()
         else:
             event.StopPropagation()
