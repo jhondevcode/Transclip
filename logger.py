@@ -39,43 +39,38 @@ class Logger:
                     log_file.write(f"{'='*30}[{datetime.datetime.now().date()}]{'='*30}\n\n"
                                    f"{'='*15}[{datetime.datetime.now().time()}]{'='*15}\n")
             except FileExistsError:
-                with open(self.__log_file, "a") as log_file:
-                    log_file.write(f"\n{'='*15}[{datetime.datetime.now().time()}]{'='*15}\n")
+                self.__write(f"\n{'='*15}[{datetime.datetime.now().time()}]{'='*15}\n")
         else:
             init(autoreset=True)
             self.__log_file = None
+
+    def __write(self, message: str):
+        with open(self.__log_file, "a") as file:
+            file.write(message)
 
     def log(self, message: str, level="info"):
         """This method is in charge of registering the data classifying them according to the level"""
         if level == "warn":
             if self.__log_file is not None:
-                with open(self.__log_file, "a") as log_file:
-                    log_file.write(
-                        f"{datetime.datetime.now()} [{threading.currentThread().getName()}]\n[Warn]: {message}\n")
+                self.__write(f"{datetime.datetime.now()} [{threading.currentThread().getName()}]\n[Warn]: {message}\n")
             else:
                 print(f"{Fore.YELLOW}"
                       f"{datetime.datetime.now()} [{threading.currentThread().getName()}]\n[Warn]: {message}")
         elif level == "error":
             if self.__log_file is not None:
-                with open(self.__log_file, "a") as log_file:
-                    log_file.write(
-                        f"{datetime.datetime.now()} [{threading.currentThread().getName()}]\n[Error]: {message}\n")
+                self.__write(f"{datetime.datetime.now()} [{threading.currentThread().getName()}]\n[Error]: {message}\n")
             else:
                 print(
                     f"{Fore.RED}{datetime.datetime.now()} [{threading.currentThread().getName()}]\n[Error]: {message}")
         elif level == "except":
             if self.__log_file is not None:
-                with open(self.__log_file, "a") as log_file:
-                    log_file.write(
-                        f"{datetime.datetime.now()} [{threading.currentThread().getName()}]\n[Except]: {message}\n")
+                self.__write(f"{datetime.datetime.now()} [{threading.currentThread().getName()}]\n[Except]: {message}\n")
             else:
                 print(
                     f"{Fore.RED}{datetime.datetime.now()} [{threading.currentThread().getName()}]\n[Except]: {message}")
         else:
             if self.__log_file is not None:
-                with open(self.__log_file, "a") as log_file:
-                    log_file.write(
-                        f"{datetime.datetime.now()} [{threading.currentThread().getName()}]\n[Info]: {message}\n")
+                self.__write(f"{datetime.datetime.now()} [{threading.currentThread().getName()}]\n[Info]: {message}\n")
             else:
                 print(
                     f"{Fore.CYAN}{datetime.datetime.now()} [{threading.currentThread().getName()}]\n[Info]: {message}")
