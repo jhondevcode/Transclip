@@ -55,28 +55,11 @@ class ConfigurationLoader(AbstractLoader):
             font_name = "Arial"
         config = {
             "core": {
-                "delay": 0.5,
-                "char": ["\n", "\r"],
-                "lang": "spanish.json"
-            },
-            "font": {
-                "family": font_name,
-                "style": "Normal",
-                "size": 15
+                "delay": 0.5
             },
             "language": {
                 "source": "en",
                 "target": "es"
-            },
-            "edit-text": {
-                "source": {
-                    "background": "#ffffff",
-                    "foreground": "#000000"
-                },
-                "target": {
-                    "background": "#ffffff",
-                    "foreground": "#000000"
-                }
             }
         }
         self.write(config, "config.json")
