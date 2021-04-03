@@ -1,0 +1,8 @@
+[build-system]
+requires = [
+    "wxpython",
+    "pyperclip",
+    "colorama",
+    "deep_translator"
+]
+build-backend = "setuptools.build_meta"
