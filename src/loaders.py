@@ -55,11 +55,16 @@ class ConfigurationLoader(AbstractLoader):
             font_name = "Arial"
         config = {
             "core": {
+                "version": "1.1.2",
                 "delay": 0.5
             },
             "language": {
                 "source": "en",
                 "target": "es"
+            },
+            "resources": {
+                "img": "src/resources/img",
+                "icon": "src/resources/icon"
             }
         }
         self.write(config, "config.json")
