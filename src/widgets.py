@@ -8,6 +8,7 @@ from wx.adv import AboutDialogInfo, AboutBox
 import logger
 from loaders import ConfigurationLoader, IconLoader
 from util import img_load_scaled_bitmap, check_button_bitmap
+import __version__
 
 
 class ConfigWizard(wx.Dialog):
@@ -129,12 +130,12 @@ class AboutDialog:
         self.__parent = parent
         self.info = AboutDialogInfo()
         self.info.SetIcon(IconLoader(name="favicon.png").get())
-        self.info.SetName("Transclip")
-        self.info.SetVersion("1.0.0", "Beta release")
-        self.info.SetCopyright("(C) 2020 jhondev-code")
-        self.info.SetDescription(desc="A small utility to translate clipboard content")
-        self.info.SetWebSite("https://github.com/jhondev-code/transclip")
-        self.info.AddDeveloper("Jhon fernandez")
+        self.info.SetName(__version__.__title__)
+        self.info.SetVersion(__version__.__version__, "Beta release")
+        self.info.SetCopyright(__version__.__copyright__)
+        self.info.SetDescription(desc=__version__.__description__)
+        self.info.SetWebSite(__version__.__url__)
+        self.info.AddDeveloper(__version__.__author__)
         # self.info.AddDocWriter("Jhon fernandez")
         # self.info.AddTranslator("Jhon fernandez")
 
