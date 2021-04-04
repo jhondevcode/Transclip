@@ -7,6 +7,7 @@ from loaders import IconLoader, ConfigurationLoader
 from widgets import TextContainer, InformationBar, AboutDialog
 from util import img_load_scaled_bitmap, check_button_bitmap
 from pyperclip import paste
+from __version__ import __title__, __version__
 
 
 # noinspection PyMethodMayBeStatic,PyUnusedLocal
@@ -15,7 +16,7 @@ class AppWindow(wx.Frame, Requester):
 
     def __init__(self):
         """Launch settings and widgets"""
-        super(AppWindow, self).__init__(None, title="Transclip 1.0.0 wx version")
+        super(AppWindow, self).__init__(None, title=f"{__title__} {__version__} wx version")
         width, height = wx.GetDisplaySize()
         # self.SetSize(width=width/2, height=height/2)
         self.SetMinSize(size=(width / 2.5, height / 2.5))
