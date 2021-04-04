@@ -55,7 +55,7 @@ class ConfigurationLoader(AbstractLoader):
             font_name = "Arial"
         config = {
             "core": {
-                "version": "1.1.2",
+                "version": "1.1.3",
                 "delay": 0.5
             },
             "language": {
@@ -74,16 +74,15 @@ class ConfigurationLoader(AbstractLoader):
 class ImageLoader(AbstractLoader):
     """This class is used to load images which are found in the resource directory"""
 
-    __resources__ = "resources/img"
-
     def __init__(self, name: str, parent="root"):
         """This constructor starts by checking if the image is in the images directory or in a subdirectory"""
         super(ImageLoader, self).__init__()
+        self.__resources = ConfigurationLoader().get("resources")["img"]
         self._image_name = name
         if parent != "root":
-            self.__path = self.__resources__ + "/" + parent + "/" + self._image_name
+            self.__path = self.__resources + "/" + parent + "/" + self._image_name
         else:
-            self.__path = self.__resources__ + "/" + self._image_name
+            self.__path = self.__resources + "/" + self._image_name
 
     def get(self) -> Image:
         """Returns the image of the specified path"""
@@ -109,16 +108,15 @@ class ImageLoader(AbstractLoader):
 class IconLoader(AbstractLoader):
     """This class is used to load icons which are found in the resource directory"""
 
-    __resources__ = "resources/icon"
-
     def __init__(self, name: str,  parent="root"):
         """This constructor starts by checking if the icon is in the images directory or in a subdirectory"""
         super(IconLoader, self).__init__()
+        self.__resources = ConfigurationLoader().get("resources")["icon"]
         self._icon_name = name
         if parent != "root":
-            self.__path = self.__resources__ + "/" + parent + "/" + self._icon_name
+            self.__path = self.__resources + "/" + parent + "/" + self._icon_name
         else:
-            self.__path = self.__resources__ + "/" + self._icon_name
+            self.__path = self.__resources + "/" + self._icon_name
 
     def get(self) -> Icon:
         """Returns the icon of the specified path"""
