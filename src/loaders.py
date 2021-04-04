@@ -8,6 +8,7 @@ import logger
 import platform
 from impl import AbstractLoader
 from wx import Icon, Image
+from __version__ import __version__
 
 
 # noinspection PyMethodMayBeStatic
@@ -55,7 +56,7 @@ class ConfigurationLoader(AbstractLoader):
             font_name = "Arial"
         config = {
             "core": {
-                "version": "1.1.3",
+                "version": __version__,
                 "delay": 0.5
             },
             "language": {
