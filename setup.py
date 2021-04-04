@@ -1,6 +1,7 @@
 from setuptools import setup
+import __version__ as inf
 
 setup(
-    name="Transclip",
-    version="1.1.2"
+    name=inf.__title__,
+    version=inf.__version__
 )
