@@ -1,6 +1,6 @@
 # Transclip
 
-![alt text](resources/screenshots/img-01.png)
+![alt text](src/resources/screenshots/img-01.png)
 
 Este es un pequeño programa para usar la api de traducción de google y traducir el texto que se encuentra en el portapapeles.
 
