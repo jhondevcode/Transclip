@@ -23,6 +23,11 @@ class AppWindow(wx.Frame, Requester):
         self.__panel = wx.Panel(self)
         self.__widget_layout = wx.BoxSizer(wx.VERTICAL)
         self.__clipboard_monitor = None
+        try:
+            self.__enabled_source_preview = bool(ConfigurationLoader().get("core")["source-preview"])
+        except Exception as ex:
+            logger.log(ex)
+            self.__enabled_source_preview = True
         self.setup_events()
         self.initialize_window_features()
         self.initialize_ui()
@@ -83,12 +88,8 @@ class AppWindow(wx.Frame, Requester):
     def _init_text_containers(self):
         """Start the text containers"""
         logger.info("Initializing text containers")
-        try:
-            enable = bool(ConfigurationLoader().get("core")["source-preview"])
-        except Exception as ex:
-            logger.log(ex)
-            enable = True
-        if enable:
+
+        if self.__enabled_source_preview:
             self.source_container = TextContainer(self.__panel)
             self.__widget_layout.Add(self.source_container, 1, wx.CENTER | wx.EXPAND)
             self.source_container.get_text_container().SetFont(wx.Font(15, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
@@ -105,7 +106,7 @@ class AppWindow(wx.Frame, Requester):
 
     def set_content(self, target: str, content: str):
         """Modify the text of the textual containers"""
-        if target == "source":
+        if target == "source" and self.__enabled_source_preview:
             self.source_container.get_text_container().SetValue(content)
         elif target == "target":
             self.target_container.get_text_container().SetValue(content)
