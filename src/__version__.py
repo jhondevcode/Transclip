@@ -1,7 +1,7 @@
 __title__ = 'Transclip'
 __description__ = 'A small utility to translate clipboard content'
 __url__ = 'https://github.com/jhondev-code/Transclip'
-__version__ = '1.1.8'
+__version__ = '1.1.9'
 __author__ = 'Jhon fernandez'
 __author_email__ = 'jhondev.code@gmail.com'
 __license__ = 'GPL-3.0'

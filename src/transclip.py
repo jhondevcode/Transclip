@@ -83,9 +83,15 @@ class AppWindow(wx.Frame, Requester):
     def _init_text_containers(self):
         """Start the text containers"""
         logger.info("Initializing text containers")
-        self.source_container = TextContainer(self.__panel)
-        self.__widget_layout.Add(self.source_container, 1, wx.CENTER | wx.EXPAND)
-        self.source_container.get_text_container().SetFont(wx.Font(15, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
+        try:
+            enable = bool(ConfigurationLoader().get("core")["source-preview"])
+        except Exception as ex:
+            logger.log(ex)
+            enable = True
+        if enable:
+            self.source_container = TextContainer(self.__panel)
+            self.__widget_layout.Add(self.source_container, 1, wx.CENTER | wx.EXPAND)
+            self.source_container.get_text_container().SetFont(wx.Font(15, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
 
         self.target_container = TextContainer(self.__panel)
         self.target_container.get_text_container().SetFont(wx.Font(15, wx.DEFAULT, wx.NORMAL, wx.NORMAL))

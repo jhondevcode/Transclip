@@ -57,7 +57,8 @@ class ConfigurationLoader(AbstractLoader):
         config = {
             "core": {
                 "version": __version__,
-                "delay": 0.5
+                "delay": 0.5,
+                "source-preview": True
             },
             "language": {
                 "source": "en",
