@@ -190,7 +190,7 @@ class AppWindow(wx.Frame, Requester):
         """This event is called when you want to close the program"""
         logger.info("Exit event called")
         dialog = wx.MessageDialog(self, message="Are you sure you want to quit?",
-                                  caption="Confirm exit", style=wx.YES_NO | wx.ICON_QUESTION,
+                                  caption="Confirm exit", style=wx.YES_NO | wx.ICON_WARNING,
                                   pos=wx.DefaultPosition)
         response = dialog.ShowModal()
         if response == wx.ID_YES:
