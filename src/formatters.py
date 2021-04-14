@@ -17,12 +17,14 @@ class PlainTextFormatter(AbstractFormatter):
         old_text = text.replace("\r", "")
         new_text = ""
         counter = 0
-        for character in text:
+        for character in old_text:
             if character == "\n":
                 if old_text[counter - 1] == ".":
                     new_text += "\n\n"
-                if old_text[counter - 1] == ":":
+                elif old_text[counter - 1] == ":":
                     new_text += "\n"
+                if old_text[counter + 1] == " ":
+                    new_text += "  "
             elif character == '-':
                 new_text += ""
             else:
