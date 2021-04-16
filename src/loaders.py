@@ -5,7 +5,6 @@
 
 import json
 import logger
-import platform
 from impl import AbstractLoader
 from wx import Icon, Image
 from __version__ import __version__
@@ -49,11 +48,6 @@ class ConfigurationLoader(AbstractLoader):
     def __load_default_config(self):
         """This method is responsible for creating a configuration file with a default configuration"""
         logger.info("Creating default configuration file")
-        os_name = platform.system().lower()
-        if os_name.__contains__("linux"):
-            font_name = "Ubuntu"
-        else:
-            font_name = "Arial"
         config = {
             "core": {
                 "version": __version__,
@@ -86,7 +80,7 @@ class ImageLoader(AbstractLoader):
         else:
             self.__path = self.__resources + "/" + self._image_name
 
-    def get(self) -> Image:
+    def get(self, key=None) -> Image:
         """Returns the image of the specified path"""
         try:
             with open(self.__path):
@@ -120,7 +114,7 @@ class IconLoader(AbstractLoader):
         else:
             self.__path = self.__resources + "/" + self._icon_name
 
-    def get(self) -> Icon:
+    def get(self, key=None) -> Icon:
         """Returns the icon of the specified path"""
         try:
             with open(self.__path):
