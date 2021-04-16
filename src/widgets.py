@@ -124,8 +124,10 @@ class InformationBar(wx.BoxSizer):
 
 
 class AboutDialog:
+    """Provides a dialog box to view the program information"""
 
     def __init__(self, parent):
+        """Load the respective information of the program"""
         super(AboutDialog, self).__init__()
         self.__parent = parent
         self.info = AboutDialogInfo()
@@ -140,4 +142,5 @@ class AboutDialog:
         # self.info.AddTranslator("Jhon fernandez")
 
     def show(self):
+        """Displays the information in a dialog box"""
         AboutBox(self.info, parent=self.__parent)
