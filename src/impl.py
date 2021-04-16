@@ -43,7 +43,7 @@ class AbstractLoader:
         """Empty constructor"""
         super(AbstractLoader, self).__init__()
 
-    def get(self) -> object:
+    def get(self, key) -> object:
         """Returns a resource or value obtained by the loading process"""
         pass
 
@@ -59,6 +59,6 @@ class AbstractFormatter:
         """Default constructor"""
         super(AbstractFormatter, self).__init__()
 
-    def format(self, object) -> object:
+    def format(self, content) -> object:
         """Used to format objects"""
         pass
