@@ -1,13 +1,14 @@
-import wx
-import logger
 from threading import Thread
-from monitoring import ClipboardMonitor
+
+import wx
+
+import logger
+from __version__ import __title__, __version__
 from impl import Requester
 from loaders import IconLoader, ConfigurationLoader
-from widgets import TextContainer, InformationBar, AboutDialog
+from monitoring import ClipboardMonitor
 from util import img_load_scaled_bitmap, check_button_bitmap
-from pyperclip import paste
-from __version__ import __title__, __version__
+from widgets import TextContainer, InformationBar, AboutDialog
 
 
 # noinspection PyMethodMayBeStatic,PyUnusedLocal
@@ -150,7 +151,7 @@ class AppWindow(wx.Frame, Requester):
         connection.start()
 
     def disconnect_from_server(self):
-        logger.info("Desconnecting...")
+        logger.info("Disconnecting...")
         try:
             logger.info("Checking the monitor")
             if self.__clipboard_monitor is not None:
