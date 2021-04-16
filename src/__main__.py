@@ -29,10 +29,10 @@ class App(wx.App):
 def main():
     """Run the app"""
     try:
-        logger.info("Cleanning the clipboard...")
+        logger.info("Cleaning the clipboard...")
         copy("")
     except Exception as ex:
-        logger.error("A error has ocurred while cleanning the clipboard")
+        logger.error("A error has occurred while cleaning the clipboard")
         logger.log(ex)
     try:
         logger.info("Running the application")
