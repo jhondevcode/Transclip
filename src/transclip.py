@@ -1,3 +1,4 @@
+import platform
 from threading import Thread
 
 import wx
@@ -5,10 +6,69 @@ import wx
 import logger
 from __version__ import __title__, __version__
 from impl import Requester
-from loaders import IconLoader, ConfigurationLoader
+from loaders import IconLoader, ConfigurationLoader, BitMapLoader
 from monitoring import ClipboardMonitor
 from util import img_load_scaled_bitmap, check_button_bitmap
 from widgets import TextContainer, InformationBar, AboutDialog
+
+
+class WindowMenuBar(wx.MenuBar):
+
+    def __init__(self, frame):
+        super(WindowMenuBar, self).__init__()
+        self.parent = frame
+        try:
+            self.initialize_components()
+        except Exception as ex:
+            logger.error(str(ex))
+            logger.log(ex)
+
+    def initialize_components(self):
+        self.file_menu = wx.Menu()
+        self.initialize_file_menu_items()
+        self.Append(self.file_menu, "&File")
+
+        self.tools_menu = wx.Menu()
+        self.initialize_tools_menu_item()
+        self.Append(self.tools_menu, "&Tools")
+
+        self.help_menu = wx.Menu()
+        self.initialize_help_menu_item()
+        self.Append(self.help_menu, "&Help")
+
+    def initialize_file_menu_items(self):
+        save_item = self.create(self.file_menu, wx.ID_SAVEAS, "Save", "Save translation", "export.png")
+        self.file_menu.Append(save_item)
+        self.Bind(wx.EVT_MENU, self.parent.save, save_item)
+
+        self.file_menu.AppendSeparator()
+
+        exit_item = self.create(self.file_menu, wx.ID_EXIT, "Exit", "Close and exit", "shutdown.png")
+        self.file_menu.Append(exit_item)
+        self.Bind(wx.EVT_MENU, self.parent.exit_button_action, exit_item)
+
+    def initialize_tools_menu_item(self):
+        settings_item = self.create(self.tools_menu, wx.ID_SETUP, "Settings", "Configure the program", "settings.png")
+        self.tools_menu.Append(settings_item)
+
+    def initialize_help_menu_item(self):
+        about_item = self.create(self.help_menu, wx.ID_ABOUT, "About of", "Program information", "about.png")
+        self.help_menu.Append(about_item)
+        self.Bind(wx.EVT_MENU, self.parent.about_button_action, about_item)
+
+    def create(self, parent, wid, label, state, icon) -> wx.MenuItem:
+        os_name = platform.system()
+        if os_name == 'Windows':
+            menu_item = wx.MenuItem(parent, wid, label, state)
+            bitmap = BitMapLoader(icon, "menubar", "icon").get()
+            if bitmap is not None:
+                try:
+                    menu_item.SetBitmap(bitmap)
+                except Exception as ex:
+                    logger.log(ex)
+            return menu_item
+        else:
+            return wx.MenuItem(parent, wid, label, state)
 
 
 # noinspection PyMethodMayBeStatic,PyUnusedLocal
@@ -39,12 +99,20 @@ class AppWindow(wx.Frame, Requester):
         logger.info("Logging window events")
         self.Bind(wx.EVT_CLOSE, self.on_destroy)
 
+    def load_window_icon(self):
+        icon = IconLoader("favicon.png")
+        if icon is not None:
+            try:
+                self.SetIcon(wx.Icon(icon.get_path()))
+            except Exception as ex:
+                logger.error(str(ex))
+                logger.log(ex)
+
     def initialize_window_features(self) -> None:
         """Configure the window characteristics"""
         logger.info("Initializing window features")
-        icon = IconLoader("favicon.png").get()
-        if icon is not None:
-            self.SetIcon(icon)
+        self.SetMenuBar(WindowMenuBar(self))
+        self.load_window_icon()
 
     def initialize_ui(self):
         """comment"""
@@ -70,20 +138,6 @@ class AppWindow(wx.Frame, Requester):
         self.stop_button.Enable(enable=False)
         option_layout.Add(self.stop_button, 0, wx.ALL, 5)
 
-        self.conf_button: wx.Button = wx.Button(self.__panel, label="Configure")
-        check_button_bitmap(self.conf_button, img_load_scaled_bitmap("settings-button.png", 16, 16))
-        self.conf_button.Bind(wx.EVT_BUTTON, self.__conf_button_action)
-        option_layout.Add(self.conf_button, 0, wx.ALL, 5)
-
-        self.about_button: wx.Button = wx.Button(self.__panel, label="About")
-        check_button_bitmap(self.about_button, img_load_scaled_bitmap("about-button.png", 16, 16))
-        self.about_button.Bind(wx.EVT_BUTTON, self.__about_button_action)
-        option_layout.Add(self.about_button, 0, wx.ALL, 5)
-
-        self.exit_button: wx.Button = wx.Button(self.__panel, label="Exit")
-        check_button_bitmap(self.exit_button, img_load_scaled_bitmap("shutdown-button.png", 16, 16))
-        self.exit_button.Bind(wx.EVT_BUTTON, self.__exit_button_action)
-        option_layout.Add(self.exit_button, 0, wx.ALL, 5)
         self.__widget_layout.Add(option_layout, 0, wx.CENTER)
 
     def _init_text_containers(self):
@@ -181,11 +235,30 @@ class AppWindow(wx.Frame, Requester):
     def __conf_button_action(self, event: wx.CommandEvent):
         pass
 
-    def __about_button_action(self, event: wx.CommandEvent):
+    def about_button_action(self, event: wx.CommandEvent):
         AboutDialog(self).show()
 
-    def __exit_button_action(self, event: wx.CommandEvent):
+    def exit_button_action(self, event: wx.CommandEvent):
         self.Close()
+
+    def save(self, event: wx.CommandEvent):
+        text = self.target_container.get_text_container().GetValue()
+        if text != "":
+            with wx.FileDialog(self, "Save file", wildcard="Plain Text File (*.txt)|*.txt",
+                               style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT) as fileDialog:
+                if fileDialog.ShowModal() == wx.ID_CANCEL:
+                    return  # the user changed their mind
+                # save the current contents in the file
+                pathname = fileDialog.GetPath()
+                try:
+                    with open(pathname, 'w') as file:
+                        file.write(text)
+                except IOError:
+                    wx.LogError(f"Cannot save current data in file '{pathname}'.")
+        else:
+            wx.MessageDialog(self, message="No content to save",
+                             caption="Error", style=wx.OK | wx.ICON_ERROR,
+                             pos=wx.DefaultPosition).ShowModal()
 
     def on_destroy(self, event):
         """This event is called when you want to close the program"""
