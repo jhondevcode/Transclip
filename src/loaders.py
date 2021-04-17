@@ -4,10 +4,14 @@
 """
 
 import json
+import sys
+
+import wx
+from wx import Image, Icon
+
 import logger
-from impl import AbstractLoader
-from wx import Icon, Image
 from __version__ import __version__
+from impl import AbstractLoader
 
 
 # noinspection PyMethodMayBeStatic
@@ -123,3 +127,40 @@ class IconLoader(AbstractLoader):
         except FileNotFoundError as ex:
             logger.error(f"Icon file '{self._icon_name}' not found", ex)
             return None
+
+    def get_path(self) -> str:
+        return self.__path
+
+
+# noinspection PyTypeChecker
+class BitMapLoader(AbstractLoader):
+
+    def __init__(self, name: str, parent="root", b_type="image"):
+        super(BitMapLoader, self).__init__()
+        self._bitmap_name = name
+        self.__path = None
+        if b_type == 'icon':
+            self.__resources = ConfigurationLoader().get("resources")["icon"]
+        elif b_type == 'image':
+            self.__resources = ConfigurationLoader().get("resources")["img"]
+        else:
+            logger.error("A error as occurred")
+            logger.warn("Exiting...")
+            sys.exit(1)
+        if parent != "root":
+            self.__path = self.__resources + "/" + parent + "/" + self._bitmap_name
+        else:
+            self.__path = self.__resources + "/" + self._bitmap_name
+
+    def get(self, key=None) -> wx.Bitmap:
+        """Returns the image icon of the specified path"""
+        try:
+            with open(self.get_path()):
+                logger.warn(self.get_path())
+                return wx.Bitmap(self.get_path())
+        except FileNotFoundError as ex:
+            logger.error(f"Icon file '{self._bitmap_name}' not found", ex)
+            return None
+
+    def get_path(self) -> str:
+        return self.__path
