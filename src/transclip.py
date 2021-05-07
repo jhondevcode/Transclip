@@ -8,6 +8,7 @@ from __version__ import __title__, __version__
 from impl import Requester
 from loaders import IconLoader, ConfigurationLoader, BitMapLoader
 from monitoring import ClipboardMonitor
+from pyperclip import copy
 from util import img_load_scaled_bitmap, check_button_bitmap
 from widgets import TextContainer, InformationBar, AboutDialog
 
@@ -48,6 +49,9 @@ class WindowMenuBar(wx.MenuBar):
         self.Bind(wx.EVT_MENU, self.parent.exit_button_action, exit_item)
 
     def initialize_tools_menu_item(self):
+        clean_item = self.create(self.tools_menu, wx.ID_ANY, "Clear clipboard", "Clean the clipboard", "clear.png")
+        self.tools_menu.Append(clean_item)
+        self.Bind(wx.EVT_MENU, lambda x: copy(""), clean_item)
         settings_item = self.create(self.tools_menu, wx.ID_SETUP, "Settings", "Configure the program", "settings.png")
         self.tools_menu.Append(settings_item)
 
