@@ -53,6 +53,14 @@ class ConfigurationLoader(AbstractLoader):
         """This method is responsible for creating a configuration file with a default configuration"""
         logger.info("Creating default configuration file")
         config = {
+            # These options allow you to configure the following actions:
+            # delay: set the time interval to monitor the clipboard
+            # example: "delay": 0.2     200 millisenconds
+            #
+            # source-preview: tells the program whether or not to show the original text.
+            # example:
+            #     true: the program sets the field to see the original text.
+            #     false: the program hides the original text field
             "core": {
                 "version": __version__,
                 "delay": 0.5,
