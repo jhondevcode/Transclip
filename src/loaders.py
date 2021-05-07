@@ -62,6 +62,11 @@ class ConfigurationLoader(AbstractLoader):
                 "source": "en",
                 "target": "es"
             },
+            # Description of resources. If you move or rearrange the resources folder, you can edit this
+            # lines to indicate the new location of the resources
+            # example:
+            # /home/user/pictures/resources/img     for linux
+            # C:/Users/user/resources/image         for windows
             "resources": {
                 "img": "src/resources/img",
                 "icon": "src/resources/icon"
