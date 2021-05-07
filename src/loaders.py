@@ -58,11 +58,17 @@ class ConfigurationLoader(AbstractLoader):
                 "delay": 0.5,
                 "source-preview": True
             },
+            # If you want to modify the target and the source, you can do it by
+            # editing these lines or else in the config.json file
+            # example:
+            # "source": "en"    spanish
+            # "target": "ru"    russian
             "language": {
                 "source": "en",
                 "target": "es"
             },
-            # Description of resources. If you move or rearrange the resources folder, you can edit this
+            # Description of resources:
+            # If you move or rearrange the resources folder, you can edit this
             # lines to indicate the new location of the resources
             # example:
             # /home/user/pictures/resources/img     for linux
