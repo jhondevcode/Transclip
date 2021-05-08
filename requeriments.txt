@@ -1,4 +1,4 @@
 wxPython===4.1.1
-deep_translator===1.4.1
+deep_translator===1.4.2
 pyperclip===1.8.2
 colorama===0.4.4
