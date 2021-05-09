@@ -151,10 +151,8 @@ class AppWindow(wx.Frame, Requester):
         if self.__enabled_source_preview:
             self.source_container = TextContainer(self.__panel)
             self.__widget_layout.Add(self.source_container, 1, wx.CENTER | wx.EXPAND)
-            self.source_container.get_text_container().SetFont(wx.Font(15, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
 
         self.target_container = TextContainer(self.__panel)
-        self.target_container.get_text_container().SetFont(wx.Font(15, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
         self.__widget_layout.Add(self.target_container, 1, wx.CENTER | wx.EXPAND)
 
     def _init_notification_bar(self):
