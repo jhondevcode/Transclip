@@ -58,6 +58,13 @@ class TextContainer(wx.BoxSizer):
         self.__text_container.Bind(wx.EVT_TEXT, self._text_push_event)
         self.Add(self.__text_container, 1, wx.EXPAND | wx.CENTER)
 
+        # Loading font size
+        try:
+            size = int(ConfigurationLoader().get("core")["font-size"])
+        except:
+            size = 15
+        self.__text_container.SetFont(wx.Font(size, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
+
     def get_text_container(self) -> wx.TextCtrl:
         """Returns the text container"""
         return self.__text_container
