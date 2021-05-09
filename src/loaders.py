@@ -54,17 +54,19 @@ class ConfigurationLoader(AbstractLoader):
         logger.info("Creating default configuration file")
         config = {
             # These options allow you to configure the following actions:
-            # delay: set the time interval to monitor the clipboard
-            # example: "delay": 0.2     200 millisenconds
+            # delay: set the time interval to monitor the clipboard.
+            # example: "delay": 0.2     200 millisenconds.
             #
             # source-preview: tells the program whether or not to show the original text.
             # example:
             #     true: the program sets the field to see the original text.
             #     false: the program hides the original text field
+            # font-size: indicates to the program the font size that the program's text containers will have.
             "core": {
                 "version": __version__,
                 "delay": 0.5,
-                "source-preview": True
+                "source-preview": True,
+                "font-size": 15
             },
             # If you want to modify the target and the source, you can do it by
             # editing these lines or else in the config.json file
