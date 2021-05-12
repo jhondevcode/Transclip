@@ -18,6 +18,8 @@ class PlainTextFormatter(AbstractFormatter):
         new_text = ""
         counter = 0
         for character in old_text:
+            if character == '-' and old_text[counter + 1] == '\n':
+                new_text += " "
             if character == "\n":
                 if old_text[counter - 1] == ".":
                     new_text += "\n\n"
@@ -25,8 +27,6 @@ class PlainTextFormatter(AbstractFormatter):
                     new_text += "\n"
                 if old_text[counter + 1] == " ":
                     new_text += "  "
-            elif character == '-':
-                new_text += ""
             else:
                 new_text += character
             counter += 1
