@@ -19,15 +19,16 @@ class PlainTextFormatter(AbstractFormatter):
         counter = 0
         for character in old_text:
             if character == '-' and old_text[counter + 1] == '\n':
-                new_text += " "
-            if character == "\n":
-                if old_text[counter - 1] == ".":
-                    new_text += "\n\n"
-                elif old_text[counter - 1] == ":":
-                    new_text += "\n"
-                if old_text[counter + 1] == " ":
-                    new_text += "  "
+                new_text += ""
             else:
-                new_text += character
+                if character == "\n":
+                    if old_text[counter - 1] == ".":
+                        new_text += "\n\n"
+                    elif old_text[counter - 1] == ":":
+                        new_text += "\n"
+                    if old_text[counter + 1] == " ":
+                        new_text += "  "
+                else:
+                    new_text += character
             counter += 1
         return new_text
