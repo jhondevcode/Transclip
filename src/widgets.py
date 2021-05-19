@@ -130,6 +130,14 @@ class InformationBar(wx.BoxSizer):
             self.__target_label.SetLabel(f"Target: {target.capitalize()}")
 
 
+class ConfigurationDialog(wx.Dialog):
+    """It will create a configuration dialog on which the program can be configured without having to do
+    so in the configuration file."""
+
+    def __init__(self):
+        super(ConfigurationDialog, self).__init__()
+
+
 class AboutDialog:
     """Provides a dialog box to view the program information"""
 
