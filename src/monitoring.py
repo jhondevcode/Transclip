@@ -61,5 +61,7 @@ class ClipboardMonitor(Thread, AbstractMonitor):
                     old_content = self.invoke_translate(clipboard_content, old_content)
                 else:
                     if old_content == "":
-                        old_content = self.invoke_translate(clipboard_content, old_content)
+                        old_content = self.invoke_translate(
+                            clipboard_content, old_content
+                        )
             sleep(self.__delay_time)
