@@ -18,7 +18,7 @@ class PlainTextFormatter(AbstractFormatter):
         new_text = ""
         counter = 0
         for character in old_text:
-            if character == '-' and old_text[counter + 1] == '\n':
+            if character == "-" and old_text[counter + 1] == "\n":
                 new_text += ""
             else:
                 if character == "\n":
