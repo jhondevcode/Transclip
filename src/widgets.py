@@ -30,7 +30,7 @@ class TextContainer(wx.BoxSizer):
 
     def __init__(self, parent: wx.Panel):
         """This constructor starts by storing the parent and then calling the methods that will start the respective
-        widgets """
+        widgets"""
         super(TextContainer, self).__init__(wx.VERTICAL)
         self.__parent = parent
         self.__init_widgets()
@@ -45,7 +45,9 @@ class TextContainer(wx.BoxSizer):
         buttons_layout = wx.BoxSizer(wx.HORIZONTAL)
 
         self.__clear_button = wx.Button(self.__parent, label="Clear")
-        check_button_bitmap(self.__clear_button, img_load_scaled_bitmap("clean-button.png", 16, 16))
+        check_button_bitmap(
+            self.__clear_button, img_load_scaled_bitmap("clean-button.png", 16, 16)
+        )
         self.__clear_button.Bind(wx.EVT_BUTTON, self._clear_button_event)
         self.__clear_button.Enable(enable=False)
         buttons_layout.Add(self.__clear_button, 0, wx.EXPAND, 5)
@@ -82,7 +84,7 @@ class TextContainer(wx.BoxSizer):
 
 class InformationBar(wx.BoxSizer):
     """Provides a notification bar in which there are labels that indicate status and a progress bar which indicates
-    the process of an operation """
+    the process of an operation"""
 
     def __init__(self, parent: wx.Panel):
         """Register the panel and call the method that starts the widgets"""
@@ -96,7 +98,9 @@ class InformationBar(wx.BoxSizer):
 
     def _init_state_labels(self):
         labels_layout = wx.BoxSizer(wx.HORIZONTAL)
-        self.__state_message: wx.StaticText = wx.StaticText(self.__parent, label="Network: Disconnected")
+        self.__state_message: wx.StaticText = wx.StaticText(
+            self.__parent, label="Network: Disconnected"
+        )
         labels_layout.Add(self.__state_message, 0, wx.ALL, 5)
 
         try:
