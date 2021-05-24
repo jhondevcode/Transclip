@@ -14,7 +14,6 @@ from widgets import TextContainer, InformationBar, AboutDialog
 
 
 class WindowMenuBar(wx.MenuBar):
-
     def __init__(self, frame):
         super(WindowMenuBar, self).__init__()
         self.parent = frame
@@ -38,31 +37,49 @@ class WindowMenuBar(wx.MenuBar):
         self.Append(self.help_menu, "&Help")
 
     def initialize_file_menu_items(self):
-        save_item = self.create(self.file_menu, wx.ID_SAVEAS, "Save", "Save translation", "export.png")
+        save_item = self.create(
+            self.file_menu, wx.ID_SAVEAS, "Save", "Save translation", "export.png"
+        )
         self.file_menu.Append(save_item)
         self.Bind(wx.EVT_MENU, self.parent.save, save_item)
 
         self.file_menu.AppendSeparator()
 
-        exit_item = self.create(self.file_menu, wx.ID_EXIT, "Exit", "Close and exit", "shutdown.png")
+        exit_item = self.create(
+            self.file_menu, wx.ID_EXIT, "Exit", "Close and exit", "shutdown.png"
+        )
         self.file_menu.Append(exit_item)
         self.Bind(wx.EVT_MENU, self.parent.exit_button_action, exit_item)
 
     def initialize_tools_menu_item(self):
-        clean_item = self.create(self.tools_menu, wx.ID_ANY, "Clear clipboard", "Clean the clipboard", "clear.png")
+        clean_item = self.create(
+            self.tools_menu,
+            wx.ID_ANY,
+            "Clear clipboard",
+            "Clean the clipboard",
+            "clear.png",
+        )
         self.tools_menu.Append(clean_item)
         self.Bind(wx.EVT_MENU, lambda x: copy(""), clean_item)
-        settings_item = self.create(self.tools_menu, wx.ID_SETUP, "Settings", "Configure the program", "settings.png")
+        settings_item = self.create(
+            self.tools_menu,
+            wx.ID_SETUP,
+            "Settings",
+            "Configure the program",
+            "settings.png",
+        )
         self.tools_menu.Append(settings_item)
 
     def initialize_help_menu_item(self):
-        about_item = self.create(self.help_menu, wx.ID_ABOUT, "About of", "Program information", "about.png")
+        about_item = self.create(
+            self.help_menu, wx.ID_ABOUT, "About of", "Program information", "about.png"
+        )
         self.help_menu.Append(about_item)
         self.Bind(wx.EVT_MENU, self.parent.about_button_action, about_item)
 
     def create(self, parent, wid, label, state, icon) -> wx.MenuItem:
         os_name = platform.system()
-        if os_name == 'Windows':
+        if os_name == "Windows":
             menu_item = wx.MenuItem(parent, wid, label, state)
             bitmap = BitMapLoader(icon, "menubar", "icon").get()
             if bitmap is not None:
@@ -81,7 +98,9 @@ class AppWindow(wx.Frame, Requester):
 
     def __init__(self):
         """Launch settings and widgets"""
-        super(AppWindow, self).__init__(None, title=f"{__title__} {__version__} wx version")
+        super(AppWindow, self).__init__(
+            None, title=f"{__title__} {__version__} wx version"
+        )
         width, height = wx.GetDisplaySize()
         # self.SetSize(width=width/2, height=height/2)
         self.SetMinSize(size=(width / 2.5, height / 2.5))
@@ -89,7 +108,9 @@ class AppWindow(wx.Frame, Requester):
         self.__widget_layout = wx.BoxSizer(wx.VERTICAL)
         self.__clipboard_monitor = None
         try:
-            self.__enabled_source_preview = bool(ConfigurationLoader().get("core")["source-preview"])
+            self.__enabled_source_preview = bool(
+                ConfigurationLoader().get("core")["source-preview"]
+            )
         except Exception as ex:
             logger.log(ex)
             self.__enabled_source_preview = True
@@ -132,12 +153,16 @@ class AppWindow(wx.Frame, Requester):
         option_layout = wx.BoxSizer(wx.HORIZONTAL)
         # initialize option buttons
         self.start_button: wx.Button = wx.Button(self.__panel, label="Start")
-        check_button_bitmap(self.start_button, img_load_scaled_bitmap("play-button.png", 16, 16))
+        check_button_bitmap(
+            self.start_button, img_load_scaled_bitmap("play-button.png", 16, 16)
+        )
         self.start_button.Bind(wx.EVT_BUTTON, self.__start_button_action)
         option_layout.Add(self.start_button, 0, wx.ALL, 5)
 
         self.stop_button: wx.Button = wx.Button(self.__panel, label="Stop")
-        check_button_bitmap(self.stop_button, img_load_scaled_bitmap("stop-button.png", 16, 16))
+        check_button_bitmap(
+            self.stop_button, img_load_scaled_bitmap("stop-button.png", 16, 16)
+        )
         self.stop_button.Bind(wx.EVT_BUTTON, self.__stop_button_action)
         self.stop_button.Enable(enable=False)
         option_layout.Add(self.stop_button, 0, wx.ALL, 5)
@@ -173,6 +198,7 @@ class AppWindow(wx.Frame, Requester):
             wx.CallAfter(self.start_button.Enable, False)
             config = ConfigurationLoader()
             from translation import PlainTextTranslator
+
             try:
                 source: str = config.get("language")["source"]
                 target: str = config.get("language")["target"]
@@ -186,7 +212,9 @@ class AppWindow(wx.Frame, Requester):
             except Exception as ex:
                 logger.log(ex)
                 delay_time: float = 0.5
-            self.__clipboard_monitor = ClipboardMonitor(self, PlainTextTranslator(source, target), delay_time)
+            self.__clipboard_monitor = ClipboardMonitor(
+                self, PlainTextTranslator(source, target), delay_time
+            )
             wx.CallAfter(self.notification_bar.set_source, source)
             wx.CallAfter(self.notification_bar.set_target, target)
             self.__clipboard_monitor.start_monitoring()
@@ -194,9 +222,13 @@ class AppWindow(wx.Frame, Requester):
             wx.CallAfter(self.stop_button.Enable, True)
         except Exception as ex:
             wx.CallAfter(self.notification_bar.set_state, "Bad network")
-            wx.MessageDialog(self, message="Can't connect to the network",
-                             caption="Error", style=wx.OK | wx.ICON_ERROR,
-                             pos=wx.DefaultPosition).ShowModal()
+            wx.MessageDialog(
+                self,
+                message="Can't connect to the network",
+                caption="Error",
+                style=wx.OK | wx.ICON_ERROR,
+                pos=wx.DefaultPosition,
+            ).ShowModal()
             wx.CallAfter(self.start_button.Enable, True)
             wx.CallAfter(self.stop_button.Enable, False)
             logger.log(ex)
@@ -246,28 +278,40 @@ class AppWindow(wx.Frame, Requester):
     def save(self, event: wx.CommandEvent):
         text = self.target_container.get_text_container().GetValue()
         if text != "":
-            with wx.FileDialog(self, "Save file", wildcard="Plain Text File (*.txt)|*.txt",
-                               style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT) as fileDialog:
+            with wx.FileDialog(
+                self,
+                "Save file",
+                wildcard="Plain Text File (*.txt)|*.txt",
+                style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT,
+            ) as fileDialog:
                 if fileDialog.ShowModal() == wx.ID_CANCEL:
                     return  # the user changed their mind
                 # save the current contents in the file
                 pathname = fileDialog.GetPath()
                 try:
-                    with open(pathname, 'w') as file:
+                    with open(pathname, "w") as file:
                         file.write(text)
                 except IOError:
                     wx.LogError(f"Cannot save current data in file '{pathname}'.")
         else:
-            wx.MessageDialog(self, message="No content to save",
-                             caption="Error", style=wx.OK | wx.ICON_ERROR,
-                             pos=wx.DefaultPosition).ShowModal()
+            wx.MessageDialog(
+                self,
+                message="No content to save",
+                caption="Error",
+                style=wx.OK | wx.ICON_ERROR,
+                pos=wx.DefaultPosition,
+            ).ShowModal()
 
     def on_destroy(self, event):
         """This event is called when you want to close the program"""
         logger.info("Exit event called")
-        dialog = wx.MessageDialog(self, message="Are you sure you want to quit?",
-                                  caption="Confirm exit", style=wx.YES_NO | wx.ICON_WARNING,
-                                  pos=wx.DefaultPosition)
+        dialog = wx.MessageDialog(
+            self,
+            message="Are you sure you want to quit?",
+            caption="Confirm exit",
+            style=wx.YES_NO | wx.ICON_WARNING,
+            pos=wx.DefaultPosition,
+        )
         response = dialog.ShowModal()
         if response == wx.ID_YES:
             try:
