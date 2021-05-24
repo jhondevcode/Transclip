@@ -15,15 +15,15 @@ from colorama import init, Fore
 
 class Logger:
     """
-        This class provides a logger to issue 3 different log levels:
-        -> info: information logs
-        -> warn: warning logs
-        -> error: error logs
+    This class provides a logger to issue 3 different log levels:
+    -> info: information logs
+    -> warn: warning logs
+    -> error: error logs
 
-        The class is able to write the registers in the terminal as well as in plain text files.
-        If the logger is configured to write to files, the log names will be based on the current system date.
-        In case the logger is configured to write to the console, the messages
-        will be colored according to the log level.
+    The class is able to write the registers in the terminal as well as in plain text files.
+    If the logger is configured to write to files, the log names will be based on the current system date.
+    In case the logger is configured to write to the console, the messages
+    will be colored according to the log level.
     """
 
     def __init__(self, file=False):
@@ -36,8 +36,10 @@ class Logger:
             self.__log_file = f"logs/log-{datetime.datetime.now().date()}.log"
             try:
                 with open(self.__log_file, "x") as log_file:
-                    log_file.write(f"{'='*30}[{datetime.datetime.now().date()}]{'='*30}\n\n"
-                                   f"{'='*15}[{datetime.datetime.now().time()}]{'='*15}\n")
+                    log_file.write(
+                        f"{'='*30}[{datetime.datetime.now().date()}]{'='*30}\n\n"
+                        f"{'='*15}[{datetime.datetime.now().time()}]{'='*15}\n"
+                    )
             except FileExistsError:
                 self.__write(f"\n{'='*15}[{datetime.datetime.now().time()}]{'='*15}\n")
         else:
@@ -52,28 +54,41 @@ class Logger:
         """This method is in charge of registering the data classifying them according to the level"""
         if level == "warn":
             if self.__log_file is not None:
-                self.__write(f"{datetime.datetime.now()} [{threading.currentThread().getName()}]\n[Warn]: {message}\n")
+                self.__write(
+                    f"{datetime.datetime.now()} [{threading.currentThread().getName()}]\n[Warn]: {message}\n"
+                )
             else:
-                print(f"{Fore.YELLOW}"
-                      f"{datetime.datetime.now()} [{threading.currentThread().getName()}]\n[Warn]: {message}")
+                print(
+                    f"{Fore.YELLOW}"
+                    f"{datetime.datetime.now()} [{threading.currentThread().getName()}]\n[Warn]: {message}"
+                )
         elif level == "error":
             if self.__log_file is not None:
-                self.__write(f"{datetime.datetime.now()} [{threading.currentThread().getName()}]\n[Error]: {message}\n")
+                self.__write(
+                    f"{datetime.datetime.now()} [{threading.currentThread().getName()}]\n[Error]: {message}\n"
+                )
             else:
                 print(
-                    f"{Fore.RED}{datetime.datetime.now()} [{threading.currentThread().getName()}]\n[Error]: {message}")
+                    f"{Fore.RED}{datetime.datetime.now()} [{threading.currentThread().getName()}]\n[Error]: {message}"
+                )
         elif level == "except":
             if self.__log_file is not None:
-                self.__write(f"{datetime.datetime.now()} [{threading.currentThread().getName()}]\n[Except]: {message}\n")
+                self.__write(
+                    f"{datetime.datetime.now()} [{threading.currentThread().getName()}]\n[Except]: {message}\n"
+                )
             else:
                 print(
-                    f"{Fore.RED}{datetime.datetime.now()} [{threading.currentThread().getName()}]\n[Except]: {message}")
+                    f"{Fore.RED}{datetime.datetime.now()} [{threading.currentThread().getName()}]\n[Except]: {message}"
+                )
         else:
             if self.__log_file is not None:
-                self.__write(f"{datetime.datetime.now()} [{threading.currentThread().getName()}]\n[Info]: {message}\n")
+                self.__write(
+                    f"{datetime.datetime.now()} [{threading.currentThread().getName()}]\n[Info]: {message}\n"
+                )
             else:
                 print(
-                    f"{Fore.CYAN}{datetime.datetime.now()} [{threading.currentThread().getName()}]\n[Info]: {message}")
+                    f"{Fore.CYAN}{datetime.datetime.now()} [{threading.currentThread().getName()}]\n[Info]: {message}"
+                )
 
 
 # Logger object, started with a default configuration.
