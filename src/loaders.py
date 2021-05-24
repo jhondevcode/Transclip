@@ -18,7 +18,7 @@ from impl import AbstractLoader
 class ConfigurationLoader(AbstractLoader):
     """This class is used to obtain information from the configuration file for the program"""
 
-    def __init__(self, file_name='config.json'):
+    def __init__(self, file_name="config.json"):
         """This constructor starts by loading the config file"""
         super(ConfigurationLoader, self).__init__()
         self.__file_name = file_name
@@ -66,27 +66,21 @@ class ConfigurationLoader(AbstractLoader):
                 "version": __version__,
                 "delay": 0.5,
                 "source-preview": True,
-                "font-size": 15
+                "font-size": 15,
             },
             # If you want to modify the target and the source, you can do it by
             # editing these lines or else in the config.json file
             # example:
             # "source": "en"    spanish
             # "target": "ru"    russian
-            "language": {
-                "source": "en",
-                "target": "es"
-            },
+            "language": {"source": "en", "target": "es"},
             # Description of resources:
             # If you move or rearrange the resources folder, you can edit this
             # lines to indicate the new location of the resources
             # example:
             # /home/user/pictures/resources/img     for linux
             # C:/Users/user/resources/image         for windows
-            "resources": {
-                "img": "src/resources/img",
-                "icon": "src/resources/icon"
-            }
+            "resources": {"img": "src/resources/img", "icon": "src/resources/icon"},
         }
         self.write(config, "config.json")
 
@@ -129,7 +123,7 @@ class ImageLoader(AbstractLoader):
 class IconLoader(AbstractLoader):
     """This class is used to load icons which are found in the resource directory"""
 
-    def __init__(self, name: str,  parent="root"):
+    def __init__(self, name: str, parent="root"):
         """This constructor starts by checking if the icon is in the images directory or in a subdirectory"""
         super(IconLoader, self).__init__()
         self.__resources = ConfigurationLoader().get("resources")["icon"]
@@ -155,14 +149,13 @@ class IconLoader(AbstractLoader):
 
 # noinspection PyTypeChecker
 class BitMapLoader(AbstractLoader):
-
     def __init__(self, name: str, parent="root", b_type="image"):
         super(BitMapLoader, self).__init__()
         self._bitmap_name = name
         self.__path = None
-        if b_type == 'icon':
+        if b_type == "icon":
             self.__resources = ConfigurationLoader().get("resources")["icon"]
-        elif b_type == 'image':
+        elif b_type == "image":
             self.__resources = ConfigurationLoader().get("resources")["img"]
         else:
             logger.error("A error as occurred")
