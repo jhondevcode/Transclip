@@ -47,7 +47,7 @@ class Logger:
             self.__log_file = None
 
     def __write(self, message: str):
-        with open(self.__log_file, "a") as file:
+        with open(self.__log_file, "a", encoding="utf-8") as file:
             file.write(message)
 
     def log(self, message: str, level="info"):
