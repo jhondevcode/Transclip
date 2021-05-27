@@ -119,6 +119,9 @@ class InformationBar(wx.BoxSizer):
         self.__target_label = wx.StaticText(self.__parent, label=f"Target: {target}")
         labels_layout.Add(self.__target_label, 0, wx.ALL, 5)
 
+        self.__number_characters = wx.StaticText(self.__parent, label="Characters: 0")
+        labels_layout.Add(self.__number_characters, 0, wx.ALL, 5)
+
         self.Add(labels_layout, 0, wx.ALL, 5)
 
     def set_state(self, state: str):
@@ -132,6 +135,10 @@ class InformationBar(wx.BoxSizer):
     def set_target(self, target: str):
         if target is not None and target != "":
             self.__target_label.SetLabel(f"Target: {target.capitalize()}")
+
+    def set_number_characters(self, n_char: int):
+        if n_char >= 0:
+            self.__number_characters.SetLabel(f"Characters: {n_char}")
 
 
 class ConfigurationDialog(wx.Dialog):

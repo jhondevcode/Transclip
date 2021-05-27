@@ -193,6 +193,9 @@ class AppWindow(wx.Frame, Requester):
         elif target == "target":
             self.target_container.get_text_container().SetValue(content)
 
+    def set_number_characters(self, n_char: int):
+        wx.CallAfter(self.notification_bar.set_number_characters, n_char)
+
     def connect_to_server(self):
         try:
             wx.CallAfter(self.start_button.Enable, False)

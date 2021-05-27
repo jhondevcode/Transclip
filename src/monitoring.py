@@ -57,6 +57,7 @@ class ClipboardMonitor(Thread, AbstractMonitor):
             clipboard_content: str = paste()
             if (clipboard_content is not None) and (clipboard_content.__len__() > 0):
                 clipboard_content = self.__formatter.format(clipboard_content)
+                wx.CallAfter(self.__requester.set_number_characters, len(clipboard_content))
                 if clipboard_content != old_content:
                     old_content = self.invoke_translate(clipboard_content, old_content)
                 else:
