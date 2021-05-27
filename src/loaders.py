@@ -103,7 +103,7 @@ class ImageLoader(AbstractLoader):
         """Returns the image of the specified path"""
         try:
             with open(self.__path):
-                logger.warn(self.__path)
+                logger.info(self.__path)
                 return Image(self.__path)
         except FileNotFoundError as ex:
             logger.error(f"Image file '{self._image_name}' not found", ex)
@@ -137,7 +137,7 @@ class IconLoader(AbstractLoader):
         """Returns the icon of the specified path"""
         try:
             with open(self.__path):
-                logger.warn(self.__path)
+                logger.info(self.__path)
                 return Icon(self.__path)
         except FileNotFoundError as ex:
             logger.error(f"Icon file '{self._icon_name}' not found", ex)
@@ -170,7 +170,7 @@ class BitMapLoader(AbstractLoader):
         """Returns the image icon of the specified path"""
         try:
             with open(self.get_path()):
-                logger.warn(self.get_path())
+                logger.info(self.get_path())
                 return wx.Bitmap(self.get_path())
         except FileNotFoundError as ex:
             logger.error(f"Icon file '{self._bitmap_name}' not found", ex)
