@@ -38,5 +38,6 @@ def paste() -> str:
 def clear():
     if not wx.TheClipboard.IsOpened():
         wx.TheClipboard.Open()
+        wx.TheClipboard.SetData(wx.TextDataObject(""))
         wx.TheClipboard.Flush()
         wx.TheClipboard.Close()
