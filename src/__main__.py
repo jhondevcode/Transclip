@@ -1,8 +1,9 @@
 import wx
 
+import sys
 import logger
 from transclip import AppWindow
-from pyperclip import copy
+from clipboard import clear, UnsupportedOperation
 
 
 # noinspection PyAttributeOutsideInit
@@ -29,14 +30,15 @@ class App(wx.App):
 def main():
     """Run the app"""
     try:
-        logger.info("Cleaning the clipboard...")
-        copy("")
-    except Exception as ex:
-        logger.error("A error has occurred while cleaning the clipboard")
-        logger.log(ex)
-    try:
         logger.info("Running the application")
         app = App()
+        try:
+            logger.info("Cleaning the clipboard...")
+            clear()
+        except UnsupportedOperation as ex:
+            logger.error("A error has occurred while cleaning the clipboard")
+            logger.log(ex)
+            sys.exit(1)
         app.MainLoop()
     except Exception as ex:
         logger.log(ex)
