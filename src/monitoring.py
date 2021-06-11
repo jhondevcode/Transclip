@@ -3,7 +3,7 @@ This module provides what is necessary to monitor the clipboard and process the 
 """
 import wx
 import logger
-from pyperclip import copy, paste
+from clipboard import copy, paste
 from time import sleep
 from threading import Thread
 from impl import AbstractMonitor
