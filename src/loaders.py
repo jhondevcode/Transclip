@@ -13,12 +13,15 @@ import logger
 from __version__ import __version__
 from impl import AbstractLoader
 
+# The value for this variable will be added from the make.py file
+INSTALL_DIR = None
+
 
 # noinspection PyMethodMayBeStatic
 class ConfigurationLoader(AbstractLoader):
     """This class is used to obtain information from the configuration file for the program"""
 
-    def __init__(self, file_name="config.json"):
+    def __init__(self, file_name="/home/jhon/.local/share/transclip/config.json"):
         """This constructor starts by loading the config file"""
         super(ConfigurationLoader, self).__init__()
         self.__file_name = file_name
@@ -42,7 +45,7 @@ class ConfigurationLoader(AbstractLoader):
     def set(self, key, value) -> None:
         """Set a new value for a key in the configuration file"""
         self.__data_file[key] = value
-        self.write(self.__data_file, "config.json")
+        self.write(self.__data_file, "/home/jhon/.local/share/transclip/config.json")
 
     def write(self, data, name):
         """Used to dump the data to the configuration file"""
@@ -80,9 +83,9 @@ class ConfigurationLoader(AbstractLoader):
             # example:
             # /home/user/pictures/resources/img     for linux
             # C:/Users/user/resources/image         for windows
-            "resources": {"img": "src/resources/img", "icon": "src/resources/icon"},
+            "resources": {"img": f"{INSTALL_DIR}/resources/img", "icon": f"{INSTALL_DIR}/resources/icon"},
         }
-        self.write(config, "config.json")
+        self.write(config, f"{INSTALL_DIR}/config.json")
 
 
 # noinspection PyTypeChecker

@@ -12,6 +12,9 @@ import threading
 import traceback
 from colorama import init, Fore
 
+# The value for this variable will be added from the make.py file
+INSTALL_DIR = None
+
 
 class Logger:
     """
@@ -30,10 +33,10 @@ class Logger:
         """Start by checking if the logger is configured to write to files or to the terminal"""
         if file:
             try:
-                os.mkdir("logs")
+                os.mkdir(f"{INSTALL_DIR}/logs")
             except OSError:
                 pass
-            self.__log_file = f"logs/log-{datetime.datetime.now().date()}.log"
+            self.__log_file = f"{INSTALL_DIR}/logs/log-{datetime.datetime.now().date()}.log"
             try:
                 with open(self.__log_file, "x") as log_file:
                     log_file.write(
