@@ -4,6 +4,10 @@ from platform import system
 from os import chdir, mkdir
 from sys import argv
 
+# This value is mandatory since there will be the path where the program will
+# be installed.
+INSTALL_DIR = ""
+
 
 class OsUtil(ABC):
     
