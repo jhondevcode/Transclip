@@ -10,10 +10,11 @@ import os
 import datetime
 import threading
 import traceback
+from os.path import join, isdir, isfile
 from colorama import init, Fore
 
 # The value for this variable will be added from the make.py file
-INSTALL_DIR = str(__file__).replace("/logger.py", "")
+LOGS_DIR = join(str(__file__).replace("/logger.py", ""), "logs")
 
 
 class Logger:
@@ -32,19 +33,21 @@ class Logger:
     def __init__(self, file=False):
         """Start by checking if the logger is configured to write to files or to the terminal"""
         if file:
-            try:
-                os.mkdir(f"{INSTALL_DIR}/logs")
-            except OSError:
-                pass
-            self.__log_file = f"{INSTALL_DIR}/logs/log-{datetime.datetime.now().date()}.log"
-            try:
-                with open(self.__log_file, "x") as log_file:
-                    log_file.write(
-                        f"{'='*30}[{datetime.datetime.now().date()}]{'='*30}\n\n"
-                        f"{'='*15}[{datetime.datetime.now().time()}]{'='*15}\n"
-                    )
-            except FileExistsError:
-                self.__write(f"\n{'='*15}[{datetime.datetime.now().time()}]{'='*15}\n")
+            exist_logdir = True
+            if not isdir(LOGS_DIR):
+                try:
+                    os.mkdir(LOGS_DIR)
+                except OSError:
+                    exist_logdir = False
+                    print("Cannot create logs directory")
+            if exist_logdir:
+                self.__log_file = join(LOGS_DIR, f"log-{datetime.datetime.now().date()}.log")
+                if not isfile(self.__log_file):
+                    with open(self.__log_file, "w") as log_file:
+                        log_file.write(
+                            f"{'='*30}[{datetime.datetime.now().date()}]{'='*30}\n\n"
+                            f"{'='*15}[{datetime.datetime.now().time()}]{'='*15}\n"
+                        )
         else:
             init(autoreset=True)
             self.__log_file = None
