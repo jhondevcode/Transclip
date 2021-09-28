@@ -32,6 +32,7 @@ class Logger:
 
     def __init__(self, file=False):
         """Start by checking if the logger is configured to write to files or to the terminal"""
+        self.__log_file = None
         if file:
             exist_logdir = True
             if not isdir(LOGS_DIR):
@@ -50,7 +51,6 @@ class Logger:
                         )
         else:
             init(autoreset=True)
-            self.__log_file = None
 
     def __write(self, message: str):
         with open(self.__log_file, "a", encoding="utf-8") as file:
