@@ -13,7 +13,7 @@ import traceback
 from colorama import init, Fore
 
 # The value for this variable will be added from the make.py file
-INSTALL_DIR = None
+INSTALL_DIR = str(__file__).replace("/logger.py", "")
 
 
 class Logger:

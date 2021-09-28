@@ -14,7 +14,7 @@ from __version__ import __version__
 from impl import AbstractLoader
 
 # The value for this variable will be added from the make.py file
-INSTALL_DIR = None
+INSTALL_DIR = str(__file__).replace("/loaders.py", "")
 
 
 # noinspection PyMethodMayBeStatic
