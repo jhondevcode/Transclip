@@ -36,3 +36,6 @@ def img_load_scaled_bitmap(name: str, width: int, height: int):
 def check_button_bitmap(button, bitmap):
     if bitmap is not None:
         button.SetBitmap(bitmap)
+
+
+WORKSPACE = str(__file__).replace("/util.py", "")
