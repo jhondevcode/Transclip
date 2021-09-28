@@ -25,4 +25,5 @@ def warn(msg, *args, **kwargs):
 def error(msg, *args, **kwargs):
     logger.error(msg, args, kwargs)
 
-def log
+def log(ex):
+    error(ex)
